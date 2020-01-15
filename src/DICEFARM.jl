@@ -2,21 +2,21 @@ using Mimi
 using ExcelReaders
 
 include("helpers.jl")
-include("FARMparameters.jl")
+include("parameters.jl")
 
 include("marginaldamage.jl")
 
-include("components/totalfactorproductivity_component.jl")
-include("components/grosseconomy_component.jl")
+include("components/DICE/totalfactorproductivity_component.jl")
+include("components/DICE/grosseconomy_component.jl")
 include("components/farm_component.jl")
-include("components/co2emissions_component.jl")
-include("components/co2cycle_component.jl")
+include("components/DICE/co2emissions_component.jl")
+include("components/DICE/co2cycle_component.jl")
 include("components/FAIR/concentrations_component.jl")
 include("components/FAIR/forcing_component.jl")
-include("components/climatedynamics_component.jl")
-include("components/damages_component.jl")
-include("components/neteconomy_component.jl")
-include("components/welfare_component.jl")
+include("components/DICE/climatedynamics_component.jl")
+include("components/DICE/damages_component.jl")
+include("components/DICE/neteconomy_component.jl")
+include("components/DICE/welfare_component.jl")
 
 export constructdice, getdiceexcel, getdicegams
 
