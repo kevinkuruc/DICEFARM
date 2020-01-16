@@ -1,0 +1,32 @@
+using Plots
+include("CalibratingDICEFARM.jl")
+DICEFARM = getcalibratedDICEFARM()
+run(DICEFARM)
+BaselineTemp = DICEFARM[:climatedynamics, :TATM]
+#OurForc = DICEFARM[:forcing, :FN2o] + DICEFARM[:forcing, :FMeth] + DICEFARM[:forcing, :FMixed] + DICEFARM[:forcing, :FTrop] + DICEFARM[:forcing, :FStrat] + DICEFARM[:forcing, :FSolar] + 3*DICEFARM[:forcing, :FBC] + DICEFARM[:forcing, :FAero] + DICEFARM[:forcing, :FWater]
+
+NoAnimals = getcalibratedDICEFARM()
+T = length(OurTemp)
+set_param!(NoAnimals, :farm, :Beef, zeros(T))
+set_param!(NoAnimals, :farm, :Dairy, zeros(T))
+set_param!(NoAnimals, :farm, :Poultry, zeros(T))
+set_param!(NoAnimals, :farm, :Pork, zeros(T))
+run(NoAnimals)
+NoAnimalsTemp = NoAnimals[:climatedynamics, :TATM]
+
+NoIndustry = getcalibratedDICEFARM()
+NewMIU = DICEFARM[:co2emissions, :MIU]
+for t = 1:T
+	if NewMIU[t]<1
+		NewMIU[t] = 1
+	end
+end
+set_param!(NoIndustry, :co2emissions, :MIU, NewMIU)
+run(NoIndustry)
+NoIndustryTemp = NoIndsutry[:climatedynamics, :TATM]
+
+t = collect(2015:t:2115)
+tempT = lenght(t)
+
+plot(t, [BaslineTemp[1:tempT] NoAnimals[1:tempT] NoIndustry[1:tempT]], label=["Base" "Vegan" "NoIndustry"], legend=:topleft)
+
