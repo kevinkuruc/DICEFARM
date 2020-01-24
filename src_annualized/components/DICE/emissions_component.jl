@@ -2,32 +2,32 @@
 	SIG0	= Variable()				#Carbon intensity 2010-2015 (kgCO2 per output 2010 USD)
 	GSIG	= Variable(index=[time])	#Change in sigma (cumulative improvement of energy efficiency)
 	SIGMA	= Variable(index=[time])	#CO2-equivalent-emissions output ratio
-    EIND    = Variable(index=[time])    #Industrial emissions (GtCO2 per year)
-    ETREE	= Variable(index=[time])	#Emissions from deforestation
-    E       = Variable(index=[time])    #Total CO2 emissions (GtCO2 per year)
+    	EIND    = Variable(index=[time])    #Industrial emissions (GtCO2 per year)
+    	ETREE	= Variable(index=[time])	#Emissions from deforestation
+    	E       = Variable(index=[time])    #Total CO2 emissions (GtCO2 per year)
 	CUMETREE= Variable(index=[time])	#Cumulative from land
-    CCA     = Variable(index=[time])    #Cumulative industrial emissions
+   	CCA     = Variable(index=[time])    #Cumulative industrial emissions
 	CCATOT	= Variable(index=[time])	#Cumulative total carbon emissions
 	N2oE  	= Variable(index=[time])	#N2O emissions by time
 	MethE 	= Variable(index=[time]) 	#Methane emissions by time
 
 	EIndReduc 	= Parameter()				#Allows you to toggle off emissions
-	Co2EFarm	= Parameter(index=[time])   #Animal Ag Co2 Emissions (GtCO2)
+	Co2EFarm	= Parameter(index=[time])   		#Animal Ag Co2 Emissions (GtCO2)
 	gsigma1 	= Parameter()				#Initial growth of sigma (per year)
 	dsig		= Parameter()				#Decline rate of decarbonization (per period)
-	e0			= Parameter()				#Industrial emissions 2015 (GtCO2 per year)
+	e0		= Parameter()				#Industrial emissions 2015 (GtCO2 per year)
 	eland0		= Parameter()				#Carbon emissions from land 2015 (GtCO2 per year)
 	deland		= Parameter()				#Decline rate of land emissions (per period)
-    MIU     	= Parameter(index=[time])   #Emission control rate GHGs
-    YGROSS  	= Parameter(index=[time])   #Gross world product GROSS of abatement and damages (trillions 2010 USD per year)
-    cca0    	= Parameter()               #Initial cumulative industrial emissions
+    	MIU     	= Parameter(index=[time])  		#Emission control rate GHGs
+    	YGROSS  	= Parameter(index=[time])  		#Gross world product GROSS of abatement and damages (trillions 2010 USD per year)
+    	cca0    	= Parameter()               		#Initial cumulative industrial emissions
 	cumetree0	=Parameter()				#Initial emissions from deforestation (see GAMS code)
-	MethERCP	= Parameter(index=[time])	#RCP methane emissions (baseline animal emissions removed in code)
-	MethEFarm	= Parameter(index=[time])	#Methane missions from farmed animals
-	N2oERCP		= Parameter(index=[time])	#RCP N2O emissions (baseline animal emissions removed in code)
-	N2oEFarm 	= Parameter(index=[time])	#N2O missions from farmed animals
-	DoubleCountCo2 = Parameter(index=[time]) #eliminate CO2 emissions from animal products here
-	CO2Marg  	= Parameter(index=[time])  #Marginal CO2
+	MethERCP	= Parameter(index=[time])		#RCP methane emissions (baseline animal emissions removed in code)
+	MethEFarm	= Parameter(index=[time])		#Methane missions from farmed animals
+	N2oERCP		= Parameter(index=[time])		#RCP N2O emissions (baseline animal emissions removed in code)
+	N2oEFarm 	= Parameter(index=[time])		#N2O missions from farmed animals
+	DoubleCountCo2 	= Parameter(index=[time]) 		#eliminate CO2 emissions from animal products here
+	CO2Marg  	= Parameter(index=[time])  		#Marginal CO2
 
     function run_timestep(p, v, d, t)
 		#Define SIG0
@@ -35,16 +35,16 @@
 			
 		#Define function for GSIG
 		if is_first(t)
-			v.GSIG[t] = log(p.gsigma1)/5 - 1 ##convert to annual growth
+			v.GSIG[t] = p.gsigma1
 		else
-			v.GSIG[t] = v.GSIG[t-1] * ((1 + p.dsig))  
+			v.GSIG[t] = v.GSIG[t-1] * (1 + p.dsig)       #dropped fifth power here
 		end
 		
 		#Define function for SIGMA
 		if is_first(t)
 			v.SIGMA[t] = v.SIG0
 		else
-			v.SIGMA[t] = v.SIGMA[t-1] * exp(v.GSIG[t-1])   
+			v.SIGMA[t] = v.SIGMA[t-1] * exp(v.GSIG[t-1]) #dropped *5 within exp()
 		end
 		
         #Define function for EIND
@@ -58,7 +58,8 @@
 		if is_first(t)
 			v.ETREE[t] = p.eland0
 		else
-			v.ETREE[t] = v.ETREE[t - 1] * (1 - log(p.deland)/5 -1)  #convert go annual growth
+			annual_deland = (1+p.deland)^.2 - 1			#deland was in 5-year terms
+			v.ETREE[t] = v.ETREE[t - 1] * (1 - annual_deland) 
 		end
 
         #Define function for E
