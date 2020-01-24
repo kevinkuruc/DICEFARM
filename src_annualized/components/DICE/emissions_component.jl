@@ -14,7 +14,7 @@
 	EIndReduc 	= Parameter()				#Allows you to toggle off emissions
 	Co2EFarm	= Parameter(index=[time])   		#Animal Ag Co2 Emissions (GtCO2)
 	gsigma1 	= Parameter()				#Initial growth of sigma (per year)
-	dsig		= Parameter()				#Decline rate of decarbonization (per period)
+	dsig		= Parameter()				#Decline rate of decarbonization (per year)
 	e0		= Parameter()				#Industrial emissions 2015 (GtCO2 per year)
 	eland0		= Parameter()				#Carbon emissions from land 2015 (GtCO2 per year)
 	deland		= Parameter()				#Decline rate of land emissions (per period)
