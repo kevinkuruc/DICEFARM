@@ -27,8 +27,8 @@
         if is_first(t)
             v.PBACKTIME[t] = p.pback
         else
-            newgback = log(p.gback)/5 - 1
-            v.PBACKTIME[t] = v.PBACKTIME[t - 1] * (1 - p.gback)
+            newgback = (1+p.gback)^.2 - 1			#convert to annualized growth
+            v.PBACKTIME[t] = v.PBACKTIME[t - 1] * (1 - newgback)
         end
 		
 		#Define function for COSTL
