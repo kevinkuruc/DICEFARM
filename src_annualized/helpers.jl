@@ -41,3 +41,28 @@ function getparams(f, range::String, parameters::Symbol, sheet::String, T)
 
     return vals
 end
+
+
+#######################################################################################################################
+# LINEARLY INTERPOLATE DICE RESULTS TO ANNUAL VALUES
+#######################################################################################################################
+# Description: This function uses linear interpolation to create an annual time series from DICE results (which have
+#              five year timesteps).
+#
+# Function Arguments:
+#
+#       data    = The DICE results to be interpolated
+#       spacing = Length of model time steps (5 for DICE).
+#----------------------------------------------------------------------------------------------------------------------
+
+function dice_interpolate(data, spacing)
+
+    # Create an interpolation object for the data (assume first and last points are end points, e.g. no interpolation beyond support).
+    interp_linear = interpolate(data, BSpline(Linear()), OnGrid())
+
+    # Create points to interpolate for (based on spacing term).
+    interp_points = collect(1:(1/spacing):length(data))
+
+    # Carry out interpolation.
+    return interp_linear[interp_points]
+end
