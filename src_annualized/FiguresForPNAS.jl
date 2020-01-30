@@ -4,6 +4,7 @@ include("DICEFARM_Annual.jl")
 DICEFARM = create_dice_farm()
 run(DICEFARM)
 BaseTemp = DICEFARM[:co2_cycle, :T]
+BaseWelfare = DICEFARM[:welfare, :UTILITY]
 DICELength = length(DICEFARM[:farm, :Beef])
 NowIndex = 2020-1765 + 1
 
@@ -16,12 +17,12 @@ OrigEggs = DICEFARM[:farm, :Eggs]
 OrigSheepGoat = DICEFARM[:farm, :SheepGoat]
 
 VeganDICE = create_dice_farm()
-set_param!(VeganDICE, :farm, :Beef, [OrigBeef[1:4]; zeros(DICELength-4)])  			#Keep 2016-2019 consumption
-set_param!(VeganDICE, :farm, :Dairy, [OrigDairy[1:4]; zeros(DICELength-4)])
-set_param!(VeganDICE, :farm, :Poultry, [OrigPoultry[1:4]; zeros(DICELength-4)])
-set_param!(VeganDICE, :farm, :Pork, [OrigPork[1:4]; zeros(DICELength-4)])
-set_param!(VeganDICE, :farm, :Eggs, [OrigEggs[1:4]; zeros(DICELength-4)])
-set_param!(VeganDICE, :farm, :SheepGoat, [OrigSheepGoat[1:4]; zeros(DICELength-4)])
+set_param!(VeganDICE, :farm, :Beef, [OrigBeef[1:6]; zeros(DICELength-6)])  			#Keep 2015-2019 consumption
+set_param!(VeganDICE, :farm, :Dairy, [OrigDairy[1:6]; zeros(DICELength-6)])
+set_param!(VeganDICE, :farm, :Poultry, [OrigPoultry[1:6]; zeros(DICELength-6)])
+set_param!(VeganDICE, :farm, :Pork, [OrigPork[1:6]; zeros(DICELength-6)])
+set_param!(VeganDICE, :farm, :Eggs, [OrigEggs[1:6]; zeros(DICELength-6)])
+set_param!(VeganDICE, :farm, :SheepGoat, [OrigSheepGoat[1:6]; zeros(DICELength-6)])
 run(VeganDICE)
 VeganTemp = VeganDICE[:co2_cycle, :T]
 plotT = 2120
@@ -38,12 +39,12 @@ PoultryPulse = copy(OrigPoultry)
 EggsPulse = copy(OrigEggs)
 SheepGoatPulse = copy(OrigSheepGoat)
 
-BeefPulse[4] = OrigBeef[4] + 1.2*(4.8) 				#Add pulse to year 2020; pump up for waste
-DairyPulse[4] = OrigDairy[4] + 1.2*(8)
-PorkPulse[4] = OrigPork[4]  + 1.2*(2.7)
-PoultryPulse[4] = OrigPoultry[4] + 1.2*(6.7)
-EggsPulse[4] = OrigEggs[4]  + 1.2*(1.5)
-SheepGoatPulse[4] = OrigSheepGoat[4] + 1.2*(.06)
+BeefPulse[6] = OrigBeef[6] + 1000*1.2*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+DairyPulse[6] = OrigDairy[6] + 1000*1.2*(8)
+PorkPulse[6] = OrigPork[6]  + 1000*1.2*(2.7)
+PoultryPulse[6] = OrigPoultry[6] + 1000*1.2*(6.7)
+EggsPulse[6] = OrigEggs[6]  + 1000*1.2*(1.5)
+SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*1.2*(.06)
 
 #Model With Vegan Pulse
 VeganPulse = create_dice_farm()
@@ -60,17 +61,20 @@ VeganIRF = VeganPulse[:co2_cycle, :T] - BaseTemp
 GasPulse = create_dice_farm()
 T = DICELength
 pulse = zeros(T)
-pulse[4] = 4.6*1e-9
+pulse[6] = 1000*4.6*1e-9
 set_param!(GasPulse, :emissions, :CO2Marg, pulse)
 run(GasPulse)
 GasIRF = GasPulse[:co2_cycle, :T] - BaseTemp
 plot(t, [VeganIRF[NowIndex:NowIndex+length(t)-1] GasIRF[NowIndex:NowIndex+length(t)-1]], legend=:topright, label=["Diet IRF" "Driving IRF"], linewidth=2, linestyle=[:solid :dash], color=[:green :black])
 savefig("VeganIRF.pdf")
 
-###Social cost computation
-W0 = VeganPulse[:welfare, :UTILITY]
-Baseline = create_dice_farm()
-SCVeg = ConsEquiv(Baseline, W0)
+###Social cost computations
+VegWelfare = VeganPulse[:welfare, :UTILITY]
+MargCons = create_dice_farm()
+set_param!(MargCons, :neteconomy, :CEQ, 1e-9)  #dropping C by 1000 total 
+run(MargCons)
+MargConsWelfare = MargCons[:welfare, :UTILITY]
+SCCVeg = (BaseWelfare - VegWelfare)/(BaseWelfare - MargConsWelfare)
 println("Starting SCs")
 ##Now do 1 Social Cost for each of Beef, Dairy, Pork, Poultry, Eggs, SheepGoat
 Meats = [:Beef, :Dairy, :Pork, :Poultry, :Eggs, :SheepGoat]
@@ -80,16 +84,15 @@ i = collect(1:1:length(Meats))
 for (meat, O, i) in zip(Meats, Origs, i)
 	tempModel = create_dice_farm();
 	Pulse = copy(O)
-	Pulse[4] = Pulse[4] + 100.0 #add 1 kg of protein
+	Pulse[6] = Pulse[6] + 20.0 #add 20 kg of protein (or 20000 grams)
 	set_param!(tempModel, :farm, meat, Pulse)
 	run(tempModel)
 	W = tempModel[:welfare, :UTILITY]
-	Baseline = create_dice_farm();
-	SCs[i] = .0002*ConsEquiv(Baseline, W)
+	SCs[i] = (BaseWelfare - W)/(BaseWelfare - MargConsWelfare) #how many thousands of dollars to reduce 1000 hamburgers produced
 end
-println("Done with SCs")
+#SCTable= [Meats', SCs']
 
-
+######################## TO DO ####################################################################################################
 ##Isocost curves
 #include("CalibratingDICEFARM.jl")
 #DICEFARM = getcalibratedDICEFARM()
