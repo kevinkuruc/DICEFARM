@@ -40,7 +40,6 @@
 
 		#Define function for GSIG
 		if is_first(t)
-			# NOTE THIS THROWS AN ERROR BECAUSE LOGGING A NEGATIVE
 			v.GSIG[t] = p.gsigma1
 		else
 			v.GSIG[t] = v.GSIG[t-1] * (1 + p.dsig)

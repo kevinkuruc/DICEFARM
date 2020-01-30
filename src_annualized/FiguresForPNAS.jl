@@ -5,6 +5,8 @@ DICEFARM = create_dice_farm()
 run(DICEFARM)
 BaseTemp = DICEFARM[:co2_cycle, :T]
 DICELength = length(DICEFARM[:farm, :Beef])
+NowIndex = 2020-1765 + 1
+
 
 OrigBeef = DICEFARM[:farm, :Beef]
 OrigDairy = DICEFARM[:farm, :Dairy]
@@ -14,7 +16,7 @@ OrigEggs = DICEFARM[:farm, :Eggs]
 OrigSheepGoat = DICEFARM[:farm, :SheepGoat]
 
 VeganDICE = create_dice_farm()
-set_param!(VeganDICE, :farm, :Beef, [OrigBeef[1:4]; zeros(DICELength-4)])
+set_param!(VeganDICE, :farm, :Beef, [OrigBeef[1:4]; zeros(DICELength-4)])  			#Keep 2016-2019 consumption
 set_param!(VeganDICE, :farm, :Dairy, [OrigDairy[1:4]; zeros(DICELength-4)])
 set_param!(VeganDICE, :farm, :Poultry, [OrigPoultry[1:4]; zeros(DICELength-4)])
 set_param!(VeganDICE, :farm, :Pork, [OrigPork[1:4]; zeros(DICELength-4)])
@@ -24,9 +26,9 @@ run(VeganDICE)
 VeganTemp = VeganDICE[:co2_cycle, :T]
 plotT = 2120
 t = collect(2020:1:plotT)
-TempDiff = BaseTemp[2020+length(t)-1765] - VeganTemp[2020+length(t)-1765]
+TempDiff = BaseTemp[NowIndex + length(t)] - VeganTemp[NowIndex+length(t)]
 println("Temp Diff is $TempDiff")
-plot(t, [BaseTemp[2020-1765+1:2020+length(t)-1765] VeganTemp[2020-1765+1:2020+length(t)-1765]], linewidth=2, linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash])
+plot(t, [BaseTemp[NowIndex:NowIndex+length(t)-1] VeganTemp[NowIndex:NowIndex+length(t)-1]], linewidth=2, linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash])
 savefig("VeganTemp.pdf")
 
 BeefPulse = copy(OrigBeef)
@@ -36,7 +38,7 @@ PoultryPulse = copy(OrigPoultry)
 EggsPulse = copy(OrigEggs)
 SheepGoatPulse = copy(OrigSheepGoat)
 
-BeefPulse[4] = OrigBeef[4] + 1.2*(4.8) 
+BeefPulse[4] = OrigBeef[4] + 1.2*(4.8) 				#Add pulse to year 2020; pump up for waste
 DairyPulse[4] = OrigDairy[4] + 1.2*(8)
 PorkPulse[4] = OrigPork[4]  + 1.2*(2.7)
 PoultryPulse[4] = OrigPoultry[4] + 1.2*(6.7)
@@ -62,30 +64,30 @@ pulse[4] = 4.6*1e-9
 set_param!(GasPulse, :emissions, :CO2Marg, pulse)
 run(GasPulse)
 GasIRF = GasPulse[:co2_cycle, :T] - BaseTemp
-plot(t, [VeganIRF[2020-1765+1:2020+length(t)-1765] GasIRF[2020-1765+1:2020+length(t)-1765]], legend=:topright, label=["Diet IRF" "Driving IRF"], linewidth=2, linestyle=[:solid :dash], color=[:green :black])
+plot(t, [VeganIRF[NowIndex:NowIndex+length(t)-1] GasIRF[NowIndex:NowIndex+length(t)-1]], legend=:topright, label=["Diet IRF" "Driving IRF"], linewidth=2, linestyle=[:solid :dash], color=[:green :black])
 savefig("VeganIRF.pdf")
 
 ###Social cost computation
-#W0 = VeganPulse[:welfare, :UTILITY]
-#Baseline = create_dice_farm()
-#SCVeg = ConsEquiv(Baseline, W0)
-#println("Starting SCs")
+W0 = VeganPulse[:welfare, :UTILITY]
+Baseline = create_dice_farm()
+SCVeg = ConsEquiv(Baseline, W0)
+println("Starting SCs")
 ##Now do 1 Social Cost for each of Beef, Dairy, Pork, Poultry, Eggs, SheepGoat
-#Meats = [:Beef, :Dairy, :Pork, :Poultry, :Eggs, :SheepGoat]
-#Origs = [OrigBeef, OrigDairy, OrigPork, OrigPoultry, OrigEggs, OrigSheepGoat]
-#SCs   = zeros(length(Meats))
-#i = collect(1:1:length(Meats))
-#for (meat, O, i) in zip(Meats, Origs, i)
-#	tempModel = create_dice_farm();
-#	Pulse = copy(O)
-#	Pulse[5] = Pulse[5] + 1.0 #add 1 kg of protein
-#	set_param!(tempModel, :farm, meat, Pulse)
-#	run(tempModel)
-#	W = tempModel[:welfare, :UTILITY]
-#	Baseline = getcalibratedDICEFARM();
-#	SCs[i] = .02*ConsEquiv(Baseline, W)
-#end
-#println("Done with SCs")
+Meats = [:Beef, :Dairy, :Pork, :Poultry, :Eggs, :SheepGoat]
+Origs = [OrigBeef, OrigDairy, OrigPork, OrigPoultry, OrigEggs, OrigSheepGoat]
+SCs   = zeros(length(Meats))
+i = collect(1:1:length(Meats))
+for (meat, O, i) in zip(Meats, Origs, i)
+	tempModel = create_dice_farm();
+	Pulse = copy(O)
+	Pulse[4] = Pulse[4] + 100.0 #add 1 kg of protein
+	set_param!(tempModel, :farm, meat, Pulse)
+	run(tempModel)
+	W = tempModel[:welfare, :UTILITY]
+	Baseline = create_dice_farm();
+	SCs[i] = .0002*ConsEquiv(Baseline, W)
+end
+println("Done with SCs")
 
 
 ##Isocost curves

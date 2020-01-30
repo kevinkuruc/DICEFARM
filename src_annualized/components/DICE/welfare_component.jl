@@ -36,10 +36,10 @@
         end  
 
         #Define function for rr
-        if is_first(t)
+        if is_first(t) 
         v.rr[t] = 1.
         else
-        v.rr[t] = v.rr[t-1]*p.rho
+        v.rr[t] = v.rr[t-1]*(1-p.rho)
         end
 
 

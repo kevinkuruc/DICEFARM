@@ -9,6 +9,7 @@ include("annual_parameters.jl")
 include(joinpath("components", "DICE", "emissions_component.jl"))
 include(joinpath("components", "DICE", "damages_component.jl"))
 include(joinpath("components", "DICE", "grosseconomy_component.jl"))
+include(joinpath("components", "DICE", "totalfactorproductivity_component.jl"))
 include(joinpath("components", "DICE", "neteconomy_component.jl"))
 include(joinpath("components", "DICE", "welfare_component.jl"))
 include(joinpath("components", "farm_component.jl"))
@@ -79,6 +80,7 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     add_comp!(m, emissions,    before = :ch4_cycle; first = start_dice_year)
     add_comp!(m, farm,         before = :emissions; first = start_dice_year)
     add_comp!(m, grosseconomy, before = :farm;      first = start_dice_year)
+    #add_comp!(m, totalfactorproductivity, before=:grosseconomy; first= start_dice_year)
 
     # Add DICEFARM components to calculate climate impacts, net output, and welfare based on FAIR temperature projections.
     add_comp!(m, damages,    after = :temperature; first = start_dice_year)
@@ -88,6 +90,10 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     #-----------------------------------------------------------------------
     # Set Exogenous Component Parameters
     #-----------------------------------------------------------------------
+    # ----- Total Factor Productivity ------ #
+    #set_param!(m, :totalfactorproductivity, :a0,    p[:a0])
+    #set_param!(m, :totalfactorproductivity, :ga0, p[:ga0])
+    #set_param!(m, :totalfactorproductivity, :dela,   p[:dela]) 
 
     # ----- Gross Economy ----- #
     set_param!(m, :grosseconomy, :l,    p[:l])
@@ -166,6 +172,7 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     # Create Internal Component Connections
     #-----------------------------------------------------------------------
     connect_param!(m, :grosseconomy, :I,  :neteconomy, :I)
+    #connect_param!(m, :grosseconomy, :AL, :totalfactorproductivity, :AL)
 
     connect_param!(m, :emissions, :YGROSS,    :grosseconomy, :YGROSS)
     connect_param!(m, :emissions, :Co2EFarm,  :farm,         :Co2EFarm)

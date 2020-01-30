@@ -91,14 +91,14 @@
     v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2[t]*p.SheepGoat[t]   # kg
     v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o[t]*p.SheepGoat[t]  # kg
 
-        if t.t>1  #reductions starting in 2020.
-        v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEDairy[t] + v.MethEPoultry[t] + v.MethEPork[t] + v.MethEEggs[t] + v.MethESheepGoat[t])*(1-p.MeatReduc)       #kg
-        v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EDairy[t] + v.Co2EPoultry[t] + v.Co2EPork[t] + v.Co2EEggs[t] + v.Co2ESheepGoat[t])/1e12)*(1-p.MeatReduc)    #GtC02
-        v.N2oEFarm[t]   = (v.N2oEBeef[t] + v.N2oEDairy[t] + v.N2oEPoultry[t] + v.N2oEPork[t] + v.N2oEEggs[t] + v.N2oESheepGoat[t])*(1-p.MeatReduc)        #kg
-        else
+        if is_first(t)  #reductions starting in 2020.
         v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEDairy[t] + v.MethEPoultry[t] + v.MethEPork[t] + v.MethEEggs[t] + v.MethESheepGoat[t])       #kg
         v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EDairy[t] + v.Co2EPoultry[t] + v.Co2EPork[t] + v.Co2EEggs[t] + v.Co2ESheepGoat[t])/1e12)    #GtC02
         v.N2oEFarm[t]   = (v.N2oEBeef[t] + v.N2oEDairy[t] + v.N2oEPoultry[t] + v.N2oEPork[t] + v.N2oEEggs[t] + v.N2oESheepGoat[t])        #kg
+        else
+        v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEDairy[t] + v.MethEPoultry[t] + v.MethEPork[t] + v.MethEEggs[t] + v.MethESheepGoat[t])*(1-p.MeatReduc)       #kg
+        v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EDairy[t] + v.Co2EPoultry[t] + v.Co2EPork[t] + v.Co2EEggs[t] + v.Co2ESheepGoat[t])/1e12)*(1-p.MeatReduc)    #GtC02
+        v.N2oEFarm[t]   = (v.N2oEBeef[t] + v.N2oEDairy[t] + v.N2oEPoultry[t] + v.N2oEPork[t] + v.N2oEEggs[t] + v.N2oESheepGoat[t])*(1-p.MeatReduc)        #kg
         end
     end
 end

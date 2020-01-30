@@ -50,7 +50,7 @@
         v.I[t] = p.S[t] * v.Y[t]
     
         #Define function for C
-        if t.t==4
+        if gettime(t)==2020
         v.C[t] = v.Y[t] - v.I[t] - p.CEQ
         else
         v.C[t] = v.Y[t] - v.I[t]
