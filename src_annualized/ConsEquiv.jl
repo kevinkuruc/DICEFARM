@@ -6,7 +6,7 @@ function ConsEquiv(m, W)
 		diff = W - m[:welfare, :UTILITY]
 		return diff
 	end
-CEQ = find_zero(f, (0, 1.5), Bisection())
+CEQ = find_zero(f, (0, 2), Bisection())
 CEQ = CEQ*1e12
 return CEQ
 end
