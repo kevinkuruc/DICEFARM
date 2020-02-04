@@ -79,7 +79,7 @@ function getdice2016excelparameters(start_year, end_year, DICEFile)
     p[:Pork]        = 1e6*2.0*p[:l] .*ones(T)
     p[:Eggs]        = 1e6*1.25*p[:l] .*ones(T)
     p[:SheepGoat]   = 1e6*.4*p[:l] .*ones(T)
-    p[:ABeef]       = .0888                       #Number of animals to produce a kilogram of protein
+    p[:ABeef]       = .0888                       #Number of animal-years to produce a kilogram of protein
     p[:APork]       = .0518227
     p[:APoultry]    = .5146
 
@@ -114,9 +114,9 @@ function getdice2016excelparameters(start_year, end_year, DICEFile)
     p[:thetaB]       = 1.0      #Moral weight on Cows
     p[:thetaP]       = 1.0      #Moral weight on Pigs
     p[:thetaC]       = 1.0      #Moral weight on Chickens
-    p[:CowEquiv]     = 1.0      #Income equivalent suffering
-    p[:PigEquiv]     = 1.0      #Income equivalent suffering
-    p[:ChickenEquiv] = 1.0      #Income equivalent suffering          
+    p[:CowEquiv]     = 1.      #Income equivalent suffering (thousands of dollars per day)
+    p[:PigEquiv]     = 1.      #Income equivalent suffering
+    p[:ChickenEquiv] = 1.      #Income equivalent suffering          
 
     #For IsoCost Curves
     p[:MeatReduc]    = 0.       #For Isocost curves
