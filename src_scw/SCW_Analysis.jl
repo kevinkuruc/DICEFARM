@@ -1,4 +1,5 @@
 using Plots
+using NLopt
 include("DICEFARM_Annual.jl")
 DICEFARM = create_dice_farm()
 run(DICEFARM)
@@ -115,4 +116,8 @@ y = ((x.^(1 - 1.45) - ones(length(x))) / (1 - 1.45)) - CL*ones(length(x))
 plot(x, y, legend=false, lw=1.1, ylabel="Utility (Less Critical Level)", xlabel="Consumption (Thousands \$ Annually)")
 hline!([0], linestyle=:dash, linecolor=:black)
 savefig("UtilityPlot.pdf")
+
+
+# --------- Optimal Policy ---------- # 
+include("opt_SCW.jl")
 
