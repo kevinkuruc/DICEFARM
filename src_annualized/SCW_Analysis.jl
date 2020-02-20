@@ -66,11 +66,12 @@ for (i,S) in enumerate(SufferingEquiv)
 	VegWelfare = VegPulse[:welfare, :UTILITY]
 	BenefitOfVegetarian[i] = (TempBaseWelfare - VegWelfare)/SCNumeraire
 end
+Basecost = BenefitofVegetarian[2]
 
-println("Costs of Non-Veg in Baseline are $BenefitOfVegetarian[2]")
+println("Costs of Non-Veg in Baseline are $Basecost")
 
 plot(SufferingEquiv, 1e-3*BenefitOfVegetarian, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands(!) \$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)", legend=false)
-savefig("SocialCostofMeatEating.pdf")
+savefig("Figures//SCW//SocialCostofMeatEating.pdf")
 
 
 # --------- Loop over values of eta ----------------- #
@@ -107,7 +108,7 @@ for (i,eta) in enumerate(etas)
 end
 
 plot(etas, 1e-3*BenefitOfVegetarianEta, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands(!) \$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)", legend=false)
-savefig("RobustnessOverEta.pdf")
+savefig("Figures//SCW//RobustnessOverEta.pdf")
 
 # --------- Now For Individual Products ------------- #
 Meats = [:Beef, :Pork, :Poultry]
@@ -145,7 +146,7 @@ println("Costs of Pork in Baseline are $Porkcost")
 println("Costs of Poultry in Baseline are $Poultrycost")
 
 plot(SufferingEquiv, SCs, color=[:brown :red :gold], label=["Beef" "Pork" "Poultry"], lw=[1.1], ylabel="Social Costs of Marginal Consumption (\$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)")
-savefig("ByAnimal.pdf")
+savefig("Figures//SCW//ByAnimal.pdf")
 
 ## Utility Plot
 x = collect(.365:.1:15)
@@ -153,7 +154,7 @@ CL = ((365*.0019) ^ (1 - 1.45) - 1) / (1 - 1.45)
 y = ((x.^(1 - 1.45) - ones(length(x))) / (1 - 1.45)) - CL*ones(length(x))
 plot(x, y, legend=false, lw=1.1, ylabel="Utility (Less Critical Level)", xlabel="Consumption (Thousands \$ Annually)")
 hline!([0], linestyle=:dash, linecolor=:black)
-savefig("UtilityPlot.pdf")
+savefig("Figures//SCW//UtilityPlot.pdf")
 
 
 # --------- Optimal Policy ---------- # 
@@ -199,35 +200,35 @@ println("Reduce Chicken by $ChickenReduc")
 println("Reduce Pork by $PorkReduc")
 
 # --------- Optimal Policy with 2 dimensional robustness -------- #
-alphas 	= collect(.002: .0005: .006)
-uAs 	= collect(.9:.1:1.9)
+#alphas 	= collect(.002: .0005: .006)
+#uAs 	= collect(.9:.1:1.9)
 
-DiffOpts = zeros(length(uAs), length(alphas))
-for (i, alpha) in enumerate(alphas)
-	for (j, Suffering) in enumerate(uAs)
-	m = create_AnimalWelfareOpt()
-	function optveg(x, grad)
-		if length(grad)>0
-		grad[1] = 1000
-		end
-    	result = veg_outcome(x[1], Suffering, alpha)
-		return result
-	end
+#DiffOpts = zeros(length(uAs), length(alphas))
+#for (i, alpha) in enumerate(alphas)
+#	for (j, Suffering) in enumerate(uAs)
+#	m = create_AnimalWelfareOpt()
+#	function optveg(x, grad)
+#		if length(grad)>0
+#		grad[1] = 1000
+#		end
+#    	result = veg_outcome(x[1], Suffering, alpha)
+#		return result
+#	end
+#
+#	opt = Opt(:LN_SBPLX, 1)
+#	opt.lower_bounds=[0.]
+#	opt.upper_bounds=[.9999999999]
+#	init = [.5]
+#	opt.xtol_rel = 1e-4
+#	opt.max_objective = optveg
+#	sol = optimize(opt, init)[2]
+#	DiffOpts[j, i] = sol[1]
+#	end
+#end
 
-	opt = Opt(:LN_SBPLX, 1)
-	opt.lower_bounds=[0.]
-	opt.upper_bounds=[.9999999999]
-	init = [.5]
-	opt.xtol_rel = 1e-4
-	opt.max_objective = optveg
-	sol = optimize(opt, init)[2]
-	DiffOpts[j, i] = sol[1]
-	end
-end
-
-plot(uAs, alpha, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
-savefig("ThreeDRobustness.pdf")
-plot(uAs, alpha, DiffOpts, legend=false, seriestype=:heatmap, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
-savefig("HeatMapRobustness.pdf")
+#plot(uAs, alpha, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
+#savefig("ThreeDRobustness.pdf")
+#plot(uAs, alpha, DiffOpts, legend=false, seriestype=:heatmap, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
+#savefig("HeatMapRobustness.pdf")
 
 
