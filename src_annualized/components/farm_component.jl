@@ -1,6 +1,5 @@
 @defcomp farm begin
     ## M a parameter since planner will solve for it in the optimization loop
-    A           = Variable(index=[time])    #Number of animal life-years per year (millions)
     Beef        = Parameter(index=[time])   #Beef Produced (kgs of protein) [Annual]
     Dairy       = Parameter(index=[time])   #Dairy Produced (kgs of protein) [Annual]
     Poultry     = Parameter(index=[time])   #Poultry Produced (kgs of protein) [Annual]
@@ -9,7 +8,6 @@
     SheepGoat   = Parameter(index=[time])   #Sheep & Goat Produced (kgs of protein) [Annual]
     MeatReduc   = Parameter()               #For isocost curves
 
-    AFarm           = Parameter(index=[time])   #Total factor productivity of farming
     sigmaBeefMeth   = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
     sigmaBeefCo2    = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
     sigmaBeefN2o    = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
@@ -64,8 +62,6 @@
     N2oEFarm       = Variable(index=[time])    # kg
  
     function run_timestep(p, v, d, t)
-	
-    v.A[t] = p.AFarm[t]*p.Beef[t]
 
     v.MethEBeef[t] = p.sigmaBeefMeth[t]*p.Beef[t]  # kg
     v.Co2EBeef[t]  = p.sigmaBeefCo2[t]*p.Beef[t]   # kg
@@ -91,7 +87,7 @@
     v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2[t]*p.SheepGoat[t]   # kg
     v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o[t]*p.SheepGoat[t]  # kg
 
-        if is_first(t)  #reductions starting in 2020.
+        if gettime(t)<2020  #reductions starting in 2020.
         v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEDairy[t] + v.MethEPoultry[t] + v.MethEPork[t] + v.MethEEggs[t] + v.MethESheepGoat[t])       #kg
         v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EDairy[t] + v.Co2EPoultry[t] + v.Co2EPork[t] + v.Co2EEggs[t] + v.Co2ESheepGoat[t])/1e12)    #GtC02
         v.N2oEFarm[t]   = (v.N2oEBeef[t] + v.N2oEDairy[t] + v.N2oEPoultry[t] + v.N2oEPork[t] + v.N2oEEggs[t] + v.N2oESheepGoat[t])        #kg

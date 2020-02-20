@@ -109,7 +109,6 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     set_param!(m, :farm, :Pork,               p[:Pork])
     set_param!(m, :farm, :Eggs,               p[:Eggs])
     set_param!(m, :farm, :SheepGoat,          p[:SheepGoat])
-    set_param!(m, :farm, :AFarm,              p[:AFarm])
     set_param!(m, :farm, :sigmaBeefMeth,      p[:sigmaBeefMeth])
     set_param!(m, :farm, :sigmaBeefCo2,       p[:sigmaBeefCo2])
     set_param!(m, :farm, :sigmaBeefN2o,       p[:sigmaBeefN2o])
@@ -164,9 +163,6 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     set_param!(m, :welfare, :rho,       p[:rho])
     set_param!(m, :welfare, :scale1,    p[:scale1])
     set_param!(m, :welfare, :scale2,    p[:scale2])
-    set_param!(m, :welfare, :AlphaMeat, p[:AlphaMeat])
-    set_param!(m, :welfare, :elasmeat,  p[:elasmeat])
-    set_param!(m, :welfare, :Beef,      p[:Beef])
 
     #-----------------------------------------------------------------------
     # Create Internal Component Connections

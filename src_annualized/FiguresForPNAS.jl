@@ -39,12 +39,12 @@ PoultryPulse = copy(OrigPoultry)
 EggsPulse = copy(OrigEggs)
 SheepGoatPulse = copy(OrigSheepGoat)
 
-BeefPulse[6] = OrigBeef[6] + 1000*1.2*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-DairyPulse[6] = OrigDairy[6] + 1000*1.2*(8)
-PorkPulse[6] = OrigPork[6]  + 1000*1.2*(2.7)
-PoultryPulse[6] = OrigPoultry[6] + 1000*1.2*(6.7)
-EggsPulse[6] = OrigEggs[6]  + 1000*1.2*(1.5)
-SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*1.2*(.06)
+BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+DairyPulse[6] = OrigDairy[6] + 1000*(8)
+PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
+PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
+EggsPulse[6] = OrigEggs[6]  + 1000*(1.5)
+SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(.06)
 
 #Model With Vegan Pulse
 VeganPulse = create_dice_farm()

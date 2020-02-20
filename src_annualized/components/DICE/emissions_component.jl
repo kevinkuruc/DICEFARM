@@ -40,7 +40,6 @@
 
 		#Define function for GSIG
 		if is_first(t)
-			# NOTE THIS THROWS AN ERROR BECAUSE LOGGING A NEGATIVE
 			v.GSIG[t] = p.gsigma1
 		else
 			v.GSIG[t] = v.GSIG[t-1] * (1 + p.dsig)
@@ -63,6 +62,7 @@
         #Define function for E
         v.E[t] = v.EIND[t] + p.ETREE[t] + p.Co2EFarm[t] - p.DoubleCountCo2[t] + p.CO2Marg[t]
 		#TODO : Remove temporary variable to convert emissions to GtC using CO₂ molecular weight (just including here as a check).
+
 		v.total_CO₂emiss_GtC[t] = v.E[t] * (12.01/44.01)
 		# Also convert land use emissions (FAIR needs to calculate forcings from land-use albedo changes).
 		# Note: Need to subtract FARM emissions from ETREE to avoid double counting (done in model set up stage).

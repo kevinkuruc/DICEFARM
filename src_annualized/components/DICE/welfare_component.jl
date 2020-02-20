@@ -3,36 +3,22 @@
     CUMCEMUTOTPER   = Variable(index=[time])    #Cumulative period utility
     PERIODU         = Variable(index=[time])    #One period utility function
     UTILITY         = Variable()                #Welfare Function
-    Meat            = Variable(index=[time])   #Some Meat aggregator (Millions of kg)
     rr              = Variable(index=[time])    #Pure social discount rate for that period
 
     CPC             = Parameter(index=[time])   #Per capita consumption (thousands 2010 USD per year)
-    Beef            = Parameter(index=[time])   #Kg of protein from beef
-    AlphaMeat       = Parameter()               #scalar on meat parameter
     l               = Parameter(index=[time])   #Level of population and labor (Millions)
     rho             = Parameter()               #Average utility social discount rate (annual)
     elasmu          = Parameter()               #Elasticity of marginal utility of consumption
-    elasmeat        = Parameter()               #Elasticity of marginal utility of meat consumption
     scale1          = Parameter()               #Multiplicative scaling coefficient
     scale2          = Parameter()               #Additive scaling coefficient
 
     function run_timestep(p, v, d, t)
-
-        v.Meat[t]   = p.Beef[t] + 1
-
-
+    
         # Define function for PERIODU  SOMETHING IS WEIRD HERE, WHY -1?
-        if p.elasmu!=1 && p.elasmeat!=1
-        v.PERIODU[t] = (p.CPC[t] ^ (1 - p.elasmu) - 1) / (1 - p.elasmu) + p.AlphaMeat*((v.Meat[t]/p.l[t])^(1-p.elasmeat) - 1)/(1-p.elasmeat)
-
-        elseif p.elasmu==1 && p.elasmeat!=1
-        v.PERIODU[t] = log(p.CPC[t]) + p.AlphaMeat*((v.Meat[t]/p.l[t])^(1-p.elasmeat) - 1)/(1-p.elasmeat)
-
-        elseif p.elasmu!=1 && p.elasmeat==1
-        v.PERIODU[t] = (p.CPC[t] ^ (1 - p.elasmu) - 1) / (1 - p.elasmu) + p.AlphaMeat*log((v.Meat[t]/p.l[t])) 
-
-        elseif p.elasmu==1 && p.elasmeat==1
-        v.PERIODU[t] = log(p.CPC[t]) + p.AlphaMeat*log((v.Meat[t]/p.l[t]))
+        if p.elasmu!=1 
+        v.PERIODU[t] = (p.CPC[t] ^ (1 - p.elasmu) - 1) / (1 - p.elasmu) 
+        else
+        v.PERIODU[t] = log(p.CPC[t]) 
         end  
 
         #Define function for rr
