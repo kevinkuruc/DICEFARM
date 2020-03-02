@@ -49,29 +49,29 @@
 
     # ------ Emissions Intensities for each gas-animal -------- #
 
-    sigmaBeefMeth   = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaBeefCo2    = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaBeefN2o    = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaBeefMeth   = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaBeefCo2    = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaBeefN2o    = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
 
-    sigmaDairyMeth  = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaDairyCo2   = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaDairyN2o   = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaDairyMeth  = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaDairyCo2   = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaDairyN2o   = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
    
-    sigmaPoultryMeth  = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaPoultryCo2   = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaPoultryN2o   = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaPoultryMeth  = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaPoultryCo2   = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaPoultryN2o   = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
    
-    sigmaPorkMeth  = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaPorkCo2   = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaPorkN2o   = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaPorkMeth  = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaPorkCo2   = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaPorkN2o   = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
 
-    sigmaEggsMeth  = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaEggsCo2   = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaEggsN2o   = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaEggsMeth  = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaEggsCo2   = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaEggsN2o   = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
 
-    sigmaSheepGoatMeth  = Parameter(index=[time])   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
-    sigmaSheepGoatCo2   = Parameter(index=[time])   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
-    sigmaSheepGoatN2o   = Parameter(index=[time])  #Kg of Nitrous Oxide per kg of protein from Beef
+    sigmaSheepGoatMeth  = Parameter()   #Kg of Methane Emissions from Beef (need to convert millions of animals into Megatons CH4)
+    sigmaSheepGoatCo2   = Parameter()   #Kg of CO2 per kg of protein from Beef (need to convert millions of animals into Gigatons)
+    sigmaSheepGoatN2o   = Parameter()  #Kg of Nitrous Oxide per kg of protein from Beef
 
     # ----- Start component --------- #
  
@@ -91,29 +91,29 @@
     v.Pigs[t]       = p.APork*Pork
     v.Chickens[t]   = p.APoultry*Poultry
 
-    v.MethEBeef[t] = p.sigmaBeefMeth[t]*Beef  # kg
-    v.Co2EBeef[t]  = p.sigmaBeefCo2[t]*Beef   # kg
-    v.N2oEBeef[t]  = p.sigmaBeefN2o[t]*Beef  # kg 
+    v.MethEBeef[t] = p.sigmaBeefMeth*Beef  # kg
+    v.Co2EBeef[t]  = p.sigmaBeefCo2*Beef   # kg
+    v.N2oEBeef[t]  = p.sigmaBeefN2o*Beef  # kg 
 
-    #v.MethEDairy[t] = p.sigmaDairyMeth[t]*Dairy  # kg
-    #v.Co2EDairy[t]  = p.sigmaDairyCo2[t]*Dairy   # kg
-    #v.N2oEDairy[t]  = p.sigmaDairyN2o[t]*Dairy  # kg 
+    #v.MethEDairy[t] = p.sigmaDairyMeth*Dairy  # kg
+    #v.Co2EDairy[t]  = p.sigmaDairyCo2*Dairy   # kg
+    #v.N2oEDairy[t]  = p.sigmaDairyN2o*Dairy  # kg 
 
-    v.MethEPoultry[t] = p.sigmaPoultryMeth[t]*Poultry  # kg
-    v.Co2EPoultry[t]  = p.sigmaPoultryCo2[t]*Poultry   # kg
-    v.N2oEPoultry[t]  = p.sigmaPoultryN2o[t]*Poultry  # kg 
+    v.MethEPoultry[t] = p.sigmaPoultryMeth*Poultry  # kg
+    v.Co2EPoultry[t]  = p.sigmaPoultryCo2*Poultry   # kg
+    v.N2oEPoultry[t]  = p.sigmaPoultryN2o*Poultry  # kg 
 
-    v.MethEPork[t] = p.sigmaPorkMeth[t]*Pork  # kg
-    v.Co2EPork[t]  = p.sigmaPorkCo2[t]*Pork   # kg
-    v.N2oEPork[t]  = p.sigmaPorkN2o[t]*Pork  # kg 
+    v.MethEPork[t] = p.sigmaPorkMeth*Pork  # kg
+    v.Co2EPork[t]  = p.sigmaPorkCo2*Pork   # kg
+    v.N2oEPork[t]  = p.sigmaPorkN2o*Pork  # kg 
 
-    #v.MethEEggs[t] = p.sigmaEggsMeth[t]*Eggs  # kg
-    #v.Co2EEggs[t]  = p.sigmaEggsCo2[t]*Eggs   # kg
-    #v.N2oEEggs[t]  = p.sigmaEggsN2o[t]*Eggs  # kg
+    #v.MethEEggs[t] = p.sigmaEggsMeth*Eggs  # kg
+    #v.Co2EEggs[t]  = p.sigmaEggsCo2*Eggs   # kg
+    #v.N2oEEggs[t]  = p.sigmaEggsN2o*Eggs  # kg
 
-    #v.MethESheepGoat[t] = p.sigmaSheepGoatMeth[t]*SheepGoat  # kg
-    #v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2[t]*SheepGoat   # kg
-    #v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o[t]*SheepGoat  # kg
+    #v.MethESheepGoat[t] = p.sigmaSheepGoatMeth*SheepGoat  # kg
+    #v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2*SheepGoat   # kg
+    #v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o*SheepGoat  # kg
 
     v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEPoultry[t] + v.MethEPork[t])       #kg
     v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EPoultry[t] + v.Co2EPork[t])/1e12)    #GtC02

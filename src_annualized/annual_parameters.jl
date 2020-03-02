@@ -81,36 +81,32 @@ function getdice2016excelparameters(start_year, end_year, DICEFile)
     p[:SheepGoat] = 1e6*.4*p[:l] .*ones(T)
     p[:AFarm] = 75.0*ones(T)             #Number of animals to produce a kilogram of meat... no idea yet
 
-    p[:sigmaBeefMeth] = 6.5*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaBeefCo2]  = 65.1*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaBeefN2o]  = 0.22*ones(T)     #N2O emissions (in kg) per kg of protein
+    p[:sigmaBeefMeth] = 6.5      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaBeefCo2]  = 65.1      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaBeefN2o]  = 0.22     #N2O emissions (in kg) per kg of protein
 
-    p[:sigmaDairyMeth] = 2.1*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaDairyCo2]  = 14.6*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaDairyN2o]  = 0.22*ones(T)     #N2O emissions (in kg) per kg of protein
+    p[:sigmaDairyMeth] = 2.1      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaDairyCo2]  = 14.6      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaDairyN2o]  = 0.22     #N2O emissions (in kg) per kg of protein
 
-    p[:sigmaPoultryMeth] = .02*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaPoultryCo2]  = 25.6*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaPoultryN2o]  = 0.03*ones(T)     #N2O emissions (in kg) per kg of protein
+    p[:sigmaPoultryMeth] = .02      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaPoultryCo2]  = 25.6      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaPoultryN2o]  = 0.03     #N2O emissions (in kg) per kg of protein
 
-    p[:sigmaPorkMeth] = .70*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaPorkCo2]  = 25.1*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaPorkN2o]  = 0.04*ones(T)     #N2O emissions (in kg) per kg of protein
+    p[:sigmaPorkMeth] = .70      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaPorkCo2]  = 25.1      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaPorkN2o]  = 0.04     #N2O emissions (in kg) per kg of protein
 
-    p[:sigmaEggsMeth] = .07*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaEggsCo2]  = 20.1*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaEggsN2o]  = 0.03*ones(T)     #N2O emissions (in kg) per kg of protein
+    p[:sigmaEggsMeth] = .07      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaEggsCo2]  = 20.1      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaEggsN2o]  = 0.03     #N2O emissions (in kg) per kg of protein
 
-    p[:sigmaSheepGoatMeth] = 4.5*ones(T)      #Methane emissions (in kg) per kg of protein 
-    p[:sigmaSheepGoatCo2]  = 20.0*ones(T)      #Co2 emissions (in kg) per kg of protein
-    p[:sigmaSheepGoatN2o]  = 0.16*ones(T)     #N2O emissions (in kg) per kg of protein
-
-    #For Welfare module
-    p[:elasmeat]     = 1.1     #CRRA parameter on meat eating... No idea yet
-    p[:AlphaMeat]    = 0.       #scalar on meat utility function
-    p[:CEQ]          = 0.       #Cons. equivalent welfare losses necessary for SCM calculation
+    p[:sigmaSheepGoatMeth] = 4.5      #Methane emissions (in kg) per kg of protein 
+    p[:sigmaSheepGoatCo2]  = 20.0      #Co2 emissions (in kg) per kg of protein
+    p[:sigmaSheepGoatN2o]  = 0.16     #N2O emissions (in kg) per kg of protein
 
     #For IsoCost Curves
+    p[:CEQ]           = 0.      #For Social Cost computation
     p[:MeatReduc]    = 0.       #For Isocost curves
     p[:EIndReduc]     = 0.       #For Isocost curves
 

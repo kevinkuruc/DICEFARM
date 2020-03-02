@@ -23,9 +23,9 @@ BeefPulse = copy(OrigBeef)
 PorkPulse = copy(OrigPork)
 PoultryPulse = copy(OrigPoultry)
 
-BeefPulse[6] = OrigBeef[6] + 1000*1.1*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-PorkPulse[6] = OrigPork[6]  + 1000*1.1*(2.7)
-PoultryPulse[6] = OrigPoultry[6] + 1000*1.1*(6.7)
+BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
+PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
 
 VegPulse = create_AnimalWelfare()
 set_param!(VegPulse, :farm, :Beef, BeefPulse)
@@ -51,9 +51,9 @@ for (i,S) in enumerate(SufferingEquiv)
 	PorkPulse = copy(OrigPork)
 	PoultryPulse = copy(OrigPoultry)
 
-	BeefPulse[6] = OrigBeef[6] + 1000*1.1*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-	PorkPulse[6] = OrigPork[6]  + 1000*1.1*(2.7)
-	PoultryPulse[6] = OrigPoultry[6] + 1000*1.1*(6.7)
+	BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+	PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
+	PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
 	set_param!(VegPulse, :welfare, :CowEquiv, S)
@@ -66,17 +66,17 @@ for (i,S) in enumerate(SufferingEquiv)
 	VegWelfare = VegPulse[:welfare, :UTILITY]
 	BenefitOfVegetarian[i] = (TempBaseWelfare - VegWelfare)/SCNumeraire
 end
-Basecost = BenefitofVegetarian[2]
+Basecost = BenefitOfVegetarian[2]
 
 println("Costs of Non-Veg in Baseline are $Basecost")
 
-plot(SufferingEquiv, 1e-3*BenefitOfVegetarian, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands(!) \$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)", legend=false)
+plot(SufferingEquiv, 1e-3*BenefitOfVegetarian, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands \$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)", legend=false)
 savefig("Figures//SCW//SocialCostofMeatEating.pdf")
 
 
 # --------- Loop over values of eta ----------------- #
 # Note, need to reset SCNumeraire since this depends on eta
-etas = collect(1.05:.1:1.85)
+etas = collect(1.05:.05:1.85)
 BenefitOfVegetarianEta = zeros(length(etas))
 for (i,eta) in enumerate(etas)
 	tempM = create_AnimalWelfare()
@@ -93,9 +93,9 @@ for (i,eta) in enumerate(etas)
 	run(MargCons)
 	tempSCNumeraire = TempBaseWelfare - MargCons[:welfare, :UTILITY]
 
-	BeefPulse[6] = OrigBeef[6] + 1000*1.1*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-	PorkPulse[6] = OrigPork[6]  + 1000*1.1*(2.7)
-	PoultryPulse[6] = OrigPoultry[6] + 1000*1.1*(6.7)
+	BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+	PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
+	PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
 	set_param!(VegPulse, :welfare, :elasmu, eta)
@@ -107,7 +107,7 @@ for (i,eta) in enumerate(etas)
 	BenefitOfVegetarianEta[i] = (TempBaseWelfare - VegWelfare)/tempSCNumeraire
 end
 
-plot(etas, 1e-3*BenefitOfVegetarianEta, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands(!) \$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)", legend=false)
+plot(etas, 1e-3*BenefitOfVegetarianEta, color=[:red], lw=[1.2], ylabel="Social Costs of Non-Vegetarian Diet \n (Thousands \$)", xlabel="Elasticity of Marginal Utility of Consumption", legend=false)
 savefig("Figures//SCW//RobustnessOverEta.pdf")
 
 # --------- Now For Individual Products ------------- #
@@ -200,35 +200,36 @@ println("Reduce Chicken by $ChickenReduc")
 println("Reduce Pork by $PorkReduc")
 
 # --------- Optimal Policy with 2 dimensional robustness -------- #
-#alphas 	= collect(.002: .0005: .006)
-#uAs 	= collect(.9:.1:1.9)
+alphas 	= collect(.002: .0005: .006)
+uAs 	= collect(.9:.1:1.9)
 
-#DiffOpts = zeros(length(uAs), length(alphas))
-#for (i, alpha) in enumerate(alphas)
-#	for (j, Suffering) in enumerate(uAs)
-#	m = create_AnimalWelfareOpt()
-#	function optveg(x, grad)
-#		if length(grad)>0
-#		grad[1] = 1000
-#		end
-#    	result = veg_outcome(x[1], Suffering, alpha)
-#		return result
-#	end
-#
-#	opt = Opt(:LN_SBPLX, 1)
-#	opt.lower_bounds=[0.]
-#	opt.upper_bounds=[.9999999999]
-#	init = [.5]
-#	opt.xtol_rel = 1e-4
-#	opt.max_objective = optveg
-#	sol = optimize(opt, init)[2]
-#	DiffOpts[j, i] = sol[1]
-#	end
-#end
+DiffOpts = zeros(length(uAs), length(alphas))
+for (i, alpha) in enumerate(alphas)
+	for (j, Suffering) in enumerate(uAs)
+	println("Starting again for heatmap")
+	m = create_AnimalWelfareOpt()
+	function optveg(x, grad)
+		if length(grad)>0
+		grad[1] = 1000
+		end
+    	result = veg_outcome(x[1], Suffering, alpha)
+		return result
+	end
 
-#plot(uAs, alpha, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
-#savefig("ThreeDRobustness.pdf")
-#plot(uAs, alpha, DiffOpts, legend=false, seriestype=:heatmap, size=[800,500], xtitle="Animal Welfare", ytitle="Marginal Utility Shifter");
-#savefig("HeatMapRobustness.pdf")
+	opt = Opt(:LN_SBPLX, 1)
+	opt.lower_bounds=[0.]
+	opt.upper_bounds=[.9999999999]
+	init = [.5]
+	opt.xtol_rel = 1e-4
+	opt.max_objective = optveg
+	sol = optimize(opt, init)[2]
+	DiffOpts[j, i] = sol[1]
+	end
+end
+
+plot(alphas, uAs, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xlabel="Animal Welfare", ylabel="Marginal Utility Shifter");
+savefig("Figures//SCW//ThreeDRobustness.pdf")
+plot(alphas, uAs, DiffOpts, seriestype=:heatmap, size=[800,500], xlabel="Animal Welfare (Human Eq. \$ per Day)", ylabel="Marginal Utility Shifter");
+savefig("Figures//SCW//HeatMapRobustness.pdf")
 
 

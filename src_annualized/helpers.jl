@@ -66,3 +66,37 @@ function dice_interpolate(data, spacing)
     # Carry out interpolation.
     return interp_linear[interp_points]
 end
+
+
+#########################################################################################################################
+# SET EMISSIONS INTENSITIES (IN REGIONAL RUNS WHERE THIS SWITCHES)
+#########################################################################################################################
+# Description: This function takes a 6x3 matrix of Animal Products x Emissions intensities and sets the intensities for
+#              farm module
+#
+# Function Arguments: 
+#           m           = model to set parameters of
+#           intesities  = 6x3 Matrix of emissions intensities for: Beef, Dairy, Poultry, Pork, Eggs, Sheep/Goats; Co2, CH4, N20
+#------------------------------------------------------------------------------------------------------------------------
+
+function set_intensities(m, intensities)
+    set_param!(m, :farm, :sigmaBeefCo2, intensities[1,1])    
+    set_param!(m, :farm, :sigmaBeefMeth, intensities[1,2])
+    set_param!(m, :farm, :sigmaBeefN2o, intensities[1,3])
+    set_param!(m, :farm, :sigmaDairyCo2, intensities[2,1])
+    set_param!(m, :farm, :sigmaDairyMeth, intensities[2,2])
+    set_param!(m, :farm, :sigmaDairyN2o, intensities[2,3])
+    set_param!(m, :farm, :sigmaPoultryCo2, intensities[3,1])
+    set_param!(m, :farm, :sigmaPoultryMeth, intensities[3,2])
+    set_param!(m, :farm, :sigmaPoultryN2o, intensities[3,3])
+    set_param!(m, :farm, :sigmaPorkCo2, intensities[4,1])
+    set_param!(m, :farm, :sigmaPorkMeth, intensities[4,2])
+    set_param!(m, :farm, :sigmaPorkN2o, intensities[4,3])
+    set_param!(m, :farm, :sigmaEggsCo2, intensities[5,1])
+    set_param!(m, :farm, :sigmaEggsMeth, intensities[5,2])
+    set_param!(m, :farm, :sigmaEggsN2o, intensities[5,3]) 
+    set_param!(m, :farm, :sigmaSheepGoatCo2, intensities[6,1])
+    set_param!(m, :farm, :sigmaSheepGoatMeth, intensities[6,2])
+    set_param!(m, :farm, :sigmaSheepGoatN2o, intensities[6,3])  
+end
+
