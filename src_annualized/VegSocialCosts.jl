@@ -8,7 +8,7 @@ function VegSocialCosts(Intensities, Diets)
 	MargCons 	= create_dice_farm()
 	set_intensities(MargCons, Intensities)
 	#set_param!(MargCons, :welfare, :rho, .001)
-	set_param!(MargCons, :neteconomy, :CEQ, 1e-9)  #dropping C by 1000 total (something weird)
+	set_param!(MargCons, :neteconomy, :CEQ, 1e-9)  #dropping C by 1000 total
 	run(MargCons)
 	MargConsWelfare = MargCons[:welfare, :UTILITY]
 	SCNumeraire 	= BaseWelfare - MargConsWelfare
@@ -89,7 +89,7 @@ function VegSocialCosts(Intensities, Diets)
 		set_param!(tempModel, :farm, meat, Pulse)
 		run(tempModel)
 		W = tempModel[:welfare, :UTILITY]
-		SocialCosts[i+2] = (BaseWelfare - W)/SCNumeraire #how many thousands of dollars to reduce 1000 hamburgers produced
+		SocialCosts[i+2] = (BaseWelfare - W)/SCNumeraire 
 	end
 
 

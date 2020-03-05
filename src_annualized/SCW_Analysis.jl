@@ -175,7 +175,7 @@ init = [.5]
 opt.xtol_rel = 1e-4
 opt.max_objective = optveg
 sol = optimize(opt, init)[2]
-println("Optimal Vegetarian Share is $sol")
+println("Optimal Vegetarian Reduction is $sol")
 
 
 function optanimals(x, grad)
@@ -200,7 +200,7 @@ println("Reduce Chicken by $ChickenReduc")
 println("Reduce Pork by $PorkReduc")
 
 # --------- Optimal Policy with 2 dimensional robustness -------- #
-alphas 	= collect(.002: .0005: .006)
+alphas 	= collect(.002: .0005: .008)
 uAs 	= collect(.9:.1:1.9)
 
 DiffOpts = zeros(length(uAs), length(alphas))
@@ -217,8 +217,8 @@ for (i, alpha) in enumerate(alphas)
 	end
 
 	opt = Opt(:LN_SBPLX, 1)
-	opt.lower_bounds=[0.]
-	opt.upper_bounds=[.9999999999]
+	opt.lower_bounds=[-1.0]
+	opt.upper_bounds=[1.0]
 	init = [.5]
 	opt.xtol_rel = 1e-4
 	opt.max_objective = optveg
@@ -227,9 +227,10 @@ for (i, alpha) in enumerate(alphas)
 	end
 end
 
-plot(alphas, uAs, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xlabel="Animal Welfare", ylabel="Marginal Utility Shifter");
+#plot(alphas, uAs, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xlabel="Animal Welfare", ylabel="Marginal Utility Shifter");
 savefig("Figures//SCW//ThreeDRobustness.pdf")
-plot(alphas, uAs, DiffOpts, seriestype=:heatmap, size=[800,500], xlabel="Animal Welfare (Human Eq. \$ per Day)", ylabel="Marginal Utility Shifter");
-savefig("Figures//SCW//HeatMapRobustness.pdf")
+alphas = alphas/.004
+plot(uAs, alphas, DiffOpts', seriestype=:heatmap, size=[800,500], xlabel="Animal Welfare (Human Eq. \$ per Day)", ylabel="Marginal Utility Shifter");
+savefig("Figures//SCW//HeatMapRobustness.svg")
 
 

@@ -31,6 +31,7 @@ TempDiff = BaseTemp[TwentyTwenty + length(t)] - VeganTemp[TwentyTwenty+length(t)
 println("Temp Diff is $TempDiff")
 plot(t, [BaseTemp[TwentyTwenty:TwentyTwenty+length(t)-1] VeganTemp[TwentyTwenty:TwentyTwenty+length(t)-1]], linewidth=2, linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash])
 savefig("Figures//PNAS//VeganTemp.pdf")
+savefig("Figures//PNAS//VeganTemp.svg")
 
 # ------ Plot Vegan Pulse vs Gas Pulse ------- #
 
@@ -69,6 +70,7 @@ run(GasPulse)
 GasIRF = GasPulse[:co2_cycle, :T] - BaseTemp
 plot(t, [VeganIRF[TwentyTwenty:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], legend=:topright, label=["Diet IRF" "Driving IRF"], linewidth=2, linestyle=[:solid :dash], color=[:green :black])
 savefig("Figures//PNAS//VeganIRF.pdf")
+savefig("Figures//PNAS//VeganIRF.svg")
 
 # -------- Social Costs (Baseline) ---------- #
 Diets = [4.8; 8; 2.7; 6.7; 1.5; .06];
@@ -78,32 +80,32 @@ BaselineSCs = VegSocialCosts(Intensities, Diets)
 
 ##Isocost curves
 isotemps = [2 2.5 3]
-MReduc1 = collect(0:.05:1)
+MReduc1 = collect(0:.02:1)
 EIndReduc1 = zeros(length(MReduc1), length(isotemps))
-#for MAXTEMP = 1:length(isotemps)
-#	for j = 1:length(MReduc1)
-#		global CO2step = .005
-#		global Co2Reduc = 1 + CO2step
-#		maxtemp = 1.
-#			while maxtemp<isotemps[MAXTEMP]
-#			Co2Reduc = Co2Reduc - CO2step
-#			m = create_dice_farm();
-#			set_param!(m, :farm, :MeatReduc, MReduc1[j])
-#			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
-#			run(m) 
-#			temp = m[:co2_cycle, :T]
-#			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+200])  #temp in next 200 years
-#			end
-#	EIndReduc1[j, MAXTEMP] = Co2Reduc
-#	end
-#end
+for MAXTEMP = 1:length(isotemps)
+	for j = 1:length(MReduc1)
+		global CO2step = .002
+		global Co2Reduc = 1 + CO2step
+		maxtemp = 1.
+			while maxtemp<isotemps[MAXTEMP]
+			Co2Reduc = Co2Reduc - CO2step
+			m = create_dice_farm();
+			set_param!(m, :farm, :MeatReduc, MReduc1[j])
+			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
+			run(m) 
+			temp = m[:co2_cycle, :T]
+			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+200])  #temp in next 200 years
+			end
+	EIndReduc1[j, MAXTEMP] = Co2Reduc
+	end
+end
 
-#M1 = 100*(ones(length(MReduc1)) - MReduc1)
-#E1 = 100*(ones(size(EIndReduc1)[1], length(isotemps)) - EIndReduc1)
+M1 = 100*(ones(length(MReduc1)) - MReduc1)
+E1 = 100*(ones(size(EIndReduc1)[1], length(isotemps)) - EIndReduc1)
 
-#plot(E1, M1, label=["2 Deg." "2.5 Deg" "3 Deg"], color=:black, linestyle=[:solid :dash :dashdot], linewidth=2, ylabel="Agricultural Emissions \n (% of Projected)", xlabel="Industrial Emissions \n (% of Projected)", xlims=(0, 100), xticks=0:10:100, yticks=0:10:100)
-savefig("Figures//PNAS//Isoquants.pdf")
-
+plot(E1, M1, label=["2 Deg." "2.5 Deg" "3 Deg"], color=:black, linestyle=[:solid :dash :dashdot], linewidth=2, ylabel="Agricultural Emissions \n (% of Projected)", xlabel="Industrial Emissions \n (% of Projected)", xlims=(0, 60), xticks=0:10:60, yticks=0:10:100, legend=:bottomleft)
+savefig("Figures//PNAS//Isoquants200.pdf")
+savefig("Figures//PNAS//Isoquants200.svg")
 
 ### Julia Contour  (Dont think this makes the cut)
 #MReduc2 = collect(0:.1:1)
@@ -142,7 +144,7 @@ MidEast_Diets 	= [1.6	; 5.2	; 2.3; 0	; .81 ; .5]  #Turkey
 NO_Diets 		= [4.7	; 8.0	; 6.7; 2.7	; 1.5 ; .06] #USA
 Oceania_Diets 	= [5.2	; 7.2	; 5.1; 1.9	; .067; 1.2] #Australia
 Russia_Diets 	= [2.5	; 6.3	; 2.8; 2.2	; 1.6 ; .02] #Russia
-SAS_Diets		= [.19	; 2.8   ; .23; .03	; .25 ; 0.1] #India
+SAS_Diets		= [.19	; 2.8  	; .23; .03	; .25 ; 0.1] #India
 SSA_Diets 		= [1.7	; 3.0	; .08; .03	; .08 ; .30] #Kenya
 WEU_Diets		= [3.7	; 8.3	; 3.2; 3.3	; 1.5 ; .42] #France
 
@@ -157,5 +159,6 @@ Russia_Socialcosts = VegSocialCosts(Russia_Intensities, Russia_Diets)
 SAS_Socialcosts = VegSocialCosts(SAS_Intensities, SAS_Diets)
 SSA_Socialcosts = VegSocialCosts(SSA_Intensities, SSA_Diets)
 WEU_Socialcosts = VegSocialCosts(WEU_Intensities, WEU_Diets)
+println("Analysis Done")
 
 

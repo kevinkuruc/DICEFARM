@@ -90,7 +90,7 @@
  
     function run_timestep(p, v, d, t)
 	
-    if gettime(t) >= 2020 #Allows planner to solve for optimal veg frac
+    if gettime(t) == 2020 #Allows planner to solve for optimal veg frac
         Beef = (1-p.MeatReduc)*(1-p.BeefReduc)*p.Beef[t]
         Pork = (1-p.MeatReduc)*(1-p.PorkReduc)*p.Pork[t]
         Poultry = (1-p.MeatReduc)*(1-p.PoultryReduc)*p.Poultry[t]
