@@ -100,7 +100,7 @@
         Poultry = p.Poultry[t]
     end
 
-    rho             = p.epsilon/(p.epsilon -1)
+    rho             = p.epsilon
     v.Meat[t]       = (p.theta_b*Beef^rho + p.theta_c*Poultry^rho + p.theta_p*Pork^rho)^(1/rho)
     v.MeatCost[t]   = p.PBeef*Beef + p.PPoultry*Poultry + p.PPork*Pork
 

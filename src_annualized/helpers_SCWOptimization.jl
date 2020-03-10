@@ -4,15 +4,15 @@ include(joinpath("AnimalWelfareModel.jl"))
 
 ## First need to calibrate prices (via relative and total consumption of meat in our 2020 period)
 #Parameters nested within CES aggregator of meats
-epsilon = 3.32   #elasticity of substitution parameter
-theta_c = .3509  #coefficient within CES on chicken
-theta_b = .2213
-theta_p = .4279
+epsilon = -1.22   #elasticity of substitution parameter
+theta_c = .43  #coefficient within CES on chicken
+theta_b = .50
+theta_p = .07
 
 # Total utility parameters
 eta = 1.45     	  # As in Nordhaus
-xi  = 2.8855 	  # From aggregate meat consumption growth vs normal consumption growth
-alpha = .004 	  # linear coefficient on meat part of utility function
+xi  = 3.17 	  # From aggregate meat consumption growth vs normal consumption growth
+alpha = .025 	  # linear coefficient on meat part of utility function
 
 #### Now using aggregate data, estimate P (aggregate price)
 temp = create_AnimalWelfare()
