@@ -29,8 +29,10 @@
 	N2oERCP		= Parameter(index=[time])	#RCP N2O emissions (baseline animal emissions removed in code)
 	N2oEFarm 	= Parameter(index=[time])	#N2O missions from farmed animals
 	DoubleCountCo2 = Parameter(index=[time]) #eliminate CO2 emissions from animal products here
-	CO2Marg  	= Parameter(index=[time])  #Marginal CO2
-
+	Co2Pulse  	= Parameter()  				#Marginal CO2
+	MethPulse  	= Parameter()  				#Marginal CO2
+	N2oPulse  	= Parameter()  				#Marginal CO2
+	
     function run_timestep(p, v, d, t)
 		#Define SIG0 
 		# NOTE: need to index based off of "t", or else arrays in Mimi are mismatched.
@@ -60,7 +62,11 @@
 		end
 
         #Define function for E
-        v.E[t] = v.EIND[t] + p.ETREE[t] + p.Co2EFarm[t] - p.DoubleCountCo2[t] + p.CO2Marg[t]
+        if gettime(t) !=2020
+        v.E[t] = v.EIND[t] + p.ETREE[t] + p.Co2EFarm[t] - p.DoubleCountCo2[t]
+        else
+        v.E[t] = v.EIND[t] + p.ETREE[t] + p.Co2EFarm[t] - p.DoubleCountCo2[t] + p.Co2Pulse
+        end
 		#TODO : Remove temporary variable to convert emissions to GtC using CO₂ molecular weight (just including here as a check).
 
 		v.total_CO₂emiss_GtC[t] = v.E[t] * (12.01/44.01)
@@ -85,11 +91,16 @@
 		#Define function for CCATOT
 		v.CCATOT[t] = v.CCA[t] + v.CUMETREE[t]
 
+		
+		if gettime(t) != 2020
 		#Methane and N2o for FAIR module (scale agriculture CH₄ and N₂O emissions from kg to Mt with factor 1e9).
-		v.MethE[t] = p.MethEFarm[t] / 1e9 + p.MethERCP[t]
+		v.MethE[t] = p.MethEFarm[t] / 1e9 + p.MethERCP[t] 
 		# Currently assuming FARM emissions in kg N2O. FAIR and RCP have Mt N₂/yr. kg -> Mt = 1e9. N₂O -> N₂ = (28.01/44.01)
 		v.N2oE[t] 	= p.N2oEFarm[t] / 1e9 * (28.01/44.01) + p.N2oERCP[t]
-
+		else
+		v.MethE[t] = p.MethEFarm[t] / 1e9 + p.MethERCP[t] + p.MethPulse
+		v.N2oE[t] 	= p.N2oEFarm[t] / 1e9 * (28.01/44.01) + p.N2oERCP[t] + p.N2oPulse
+		end
     end
 end
 

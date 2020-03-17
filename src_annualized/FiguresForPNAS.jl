@@ -1,4 +1,5 @@
 using Plots
+using Roots
 include("DICEFARM_Annual.jl")
 include("VegSocialCosts.jl")
 DICEFARM = create_dice_farm()
@@ -42,11 +43,11 @@ PoultryPulse = copy(OrigPoultry)
 EggsPulse = copy(OrigEggs)
 SheepGoatPulse = copy(OrigSheepGoat)
 
-BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020
+BeefPulse[6] = OrigBeef[6] + 1000*(4.5) 				#Add pulse to year 2020
 DairyPulse[6] = OrigDairy[6] + 1000*(8)
 PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
-PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
-EggsPulse[6] = OrigEggs[6]  + 1000*(1.5)
+PoultryPulse[6] = OrigPoultry[6] + 1000*(6.5)
+EggsPulse[6] = OrigEggs[6]  + 1000*(1.6)
 SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(.06)
 
 #Model With Vegan Pulse
@@ -63,49 +64,97 @@ VeganIRF = VeganPulse[:co2_cycle, :T] - BaseTemp
 ##Model with Gasoline Pulse
 GasPulse = create_dice_farm()
 T = DICELength
-pulse = zeros(T)
-pulse[6] = 1000*4.6*1e-9
-set_param!(GasPulse, :emissions, :CO2Marg, pulse)
+pulse = 1000*4.63*1e-9
+set_param!(GasPulse, :emissions, :Co2Pulse, pulse)
 run(GasPulse)
 GasIRF = GasPulse[:co2_cycle, :T] - BaseTemp
-plot(t, [VeganIRF[TwentyTwenty:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], legend=:topright, label=["Diet IRF" "Driving IRF"], linewidth=2, linestyle=[:solid :dash], color=[:green :black])
+HHEnergyPulse = create_dice_farm()
+T = DICELength
+pulse = 1000*8.67/2.5*1e-9
+set_param!(HHEnergyPulse, :emissions, :Co2Pulse, pulse)
+run(HHEnergyPulse)
+HHEnergyIRF = HHEnergyPulse[:co2_cycle, :T] - BaseTemp
+plot(t, 1e-3*[VeganIRF[TwentyTwenty:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty:TwentyTwenty+length(t)-1] HHEnergyIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], legend=:topright, label=["Diet" "Passenger Vehicle" "Household Energy (Per Cap.)"], linewidth=2, linestyle=[:solid :dash :dashdot], color=[:green :black :orange], ylabel="Temperature Change (C)")
 savefig("Figures//PNAS//VeganIRF.pdf")
 savefig("Figures//PNAS//VeganIRF.svg")
+
+# -------- Total Social Costs --------------- #
+GlobalVeganPulse = create_dice_farm()
+GlobalBeefPulse = copy(OrigBeef)
+GlobalDairyPulse = copy(OrigDairy)
+GlobalPorkPulse = copy(OrigPork)
+GlobalPoultryPulse = copy(OrigPoultry)
+GlobalEggsPulse = copy(OrigEggs)
+GlobalSheepGoatPulse = copy(OrigSheepGoat)
+
+GlobalBeefPulse[6] = 0
+GlobalDairyPulse[6] = 0
+GlobalPorkPulse[6] = 0
+GlobalPoultryPulse[6] = 0
+GlobalEggsPulse[6] = 0
+GlobalSheepGoatPulse[6] = 0
+
+set_param!(GlobalVeganPulse, :farm, :Beef, GlobalBeefPulse)
+set_param!(GlobalVeganPulse, :farm, :Dairy, GlobalDairyPulse)
+set_param!(GlobalVeganPulse, :farm, :Poultry, GlobalPoultryPulse)
+set_param!(GlobalVeganPulse, :farm, :Pork, GlobalPorkPulse)
+set_param!(GlobalVeganPulse, :farm, :Eggs, GlobalEggsPulse)
+set_param!(GlobalVeganPulse, :farm, :SheepGoat, GlobalSheepGoatPulse)
+
+run(GlobalVeganPulse)
+WGlobalPulse = GlobalVeganPulse[:welfare, :UTILITY]
+
+NewBaseline = create_dice_farm()
+
+function ConsEquiv(m, W)
+	function f(x)
+		set_param!(m, :neteconomy, :CEQ, x)
+		run(m)
+		diff = m[:welfare, :UTILITY] - W
+		return diff
+	end
+CEQ = find_zero(f, (-1, 1), Bisection())
+CEQ = CEQ
+return CEQ
+end
+
+GlobalPulseCost = -1000*ConsEquiv(NewBaseline, WGlobalPulse) #convert from trillions to billions
+println("Total Social Costs of 1 year of meat production are $GlobalPulseCost Billion dollars")
 
 # -------- Social Costs (Baseline) ---------- #
 Diets = [4.8; 8; 2.7; 6.7; 1.5; .06];
 Intensities = [65.1 6.5 .22; 14.6 2.1 .22; 25.6 .02 .02; 25.1 .70 .03; 20.1 .07 .03; 20 4.5 .016];
-BaselineSCs = VegSocialCosts(Intensities, Diets)
+BaselineSCs = VegSocialCosts(Diets, Intensities)
 ## STERN SOCIAL COSTS SOLVED BY TEMPORARILY CHANGING THE VegSocialCosts FUNCTION
 
 ##Isocost curves
-isotemps = [2 2.5 3]
-MReduc1 = collect(0:.02:1)
-EIndReduc1 = zeros(length(MReduc1), length(isotemps))
-for MAXTEMP = 1:length(isotemps)
-	for j = 1:length(MReduc1)
-		global CO2step = .002
-		global Co2Reduc = 1 + CO2step
-		maxtemp = 1.
-			while maxtemp<isotemps[MAXTEMP]
-			Co2Reduc = Co2Reduc - CO2step
-			m = create_dice_farm();
-			set_param!(m, :farm, :MeatReduc, MReduc1[j])
-			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
-			run(m) 
-			temp = m[:co2_cycle, :T]
-			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+200])  #temp in next 200 years
-			end
-	EIndReduc1[j, MAXTEMP] = Co2Reduc
-	end
-end
+#isotemps = [2 2.5 3]
+#MReduc1 = collect(0:.02:1)
+#EIndReduc1 = zeros(length(MReduc1), length(isotemps))
+#for MAXTEMP = 1:length(isotemps)
+#	for j = 1:length(MReduc1)
+#		global CO2step = .002
+#		global Co2Reduc = 1 + CO2step
+#		maxtemp = 1.
+#			while maxtemp<isotemps[MAXTEMP]
+#			Co2Reduc = Co2Reduc - CO2step
+#			m = create_dice_farm();
+#			set_param!(m, :farm, :MeatReduc, MReduc1[j])
+#			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
+#			run(m) 
+#			temp = m[:co2_cycle, :T]
+#			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+200])  #temp in next 200 years
+#			end
+#	EIndReduc1[j, MAXTEMP] = Co2Reduc
+#	end
+#end
 
-M1 = 100*(ones(length(MReduc1)) - MReduc1)
-E1 = 100*(ones(size(EIndReduc1)[1], length(isotemps)) - EIndReduc1)
+#M1 = 100*(ones(length(MReduc1)) - MReduc1)
+#E1 = 100*(ones(size(EIndReduc1)[1], length(isotemps)) - EIndReduc1)
 
-plot(E1, M1, label=["2 Deg." "2.5 Deg" "3 Deg"], color=:black, linestyle=[:solid :dash :dashdot], linewidth=2, ylabel="Agricultural Emissions \n (% of Projected)", xlabel="Industrial Emissions \n (% of Projected)", xlims=(0, 60), xticks=0:10:60, yticks=0:10:100, legend=:bottomleft)
-savefig("Figures//PNAS//Isoquants200.pdf")
-savefig("Figures//PNAS//Isoquants200.svg")
+#plot(E1, M1, label=["2 Deg." "2.5 Deg" "3 Deg"], color=:black, linestyle=[:solid :dash :dashdot], linewidth=2, ylabel="Agricultural Emissions \n (% of Projected)", xlabel="Industrial Emissions \n (% of Projected)", xlims=(0, 60), xticks=0:10:60, yticks=0:10:100, legend=:bottomleft)
+#savefig("Figures//PNAS//Isoquants200.pdf")
+#savefig("Figures//PNAS//Isoquants200.svg")
 
 ### Julia Contour  (Dont think this makes the cut)
 #MReduc2 = collect(0:.1:1)
@@ -149,16 +198,24 @@ SSA_Diets 		= [1.7	; 3.0	; .08; .03	; .08 ; .30] #Kenya
 WEU_Diets		= [3.7	; 8.3	; 3.2; 3.3	; 1.5 ; .42] #France
 
 
-ESEA_Socialcosts = VegSocialCosts(ESEA_Intensities, ESEA_Diets)
-EEU_Socialcosts = VegSocialCosts(EEU_Intensities, EEU_Diets)
-LatAm_Socialcosts = VegSocialCosts(LatAm_Intensities, LatAm_Diets)
-MidEast_Socialcosts = VegSocialCosts(MidEast_Intensities, MidEast_Diets)
-NO_Socialcosts = VegSocialCosts(NO_Intensities, NO_Diets)
-Oceania_Socialcosts = VegSocialCosts(Oceania_Intensities, Oceania_Diets)
-Russia_Socialcosts = VegSocialCosts(Russia_Intensities, Russia_Diets)
-SAS_Socialcosts = VegSocialCosts(SAS_Intensities, SAS_Diets)
-SSA_Socialcosts = VegSocialCosts(SSA_Intensities, SSA_Diets)
-WEU_Socialcosts = VegSocialCosts(WEU_Intensities, WEU_Diets)
+ESEA_Socialcosts = VegSocialCosts(ESEA_Diets, ESEA_Intensities)
+EEU_Socialcosts = VegSocialCosts(EEU_Diets, EEU_Intensities)
+LatAm_Socialcosts = VegSocialCosts(LatAm_Diets, LatAm_Intensities)
+MidEast_Socialcosts = VegSocialCosts(MidEast_Diets, MidEast_Intensities)
+NO_Socialcosts = VegSocialCosts(NO_Diets, NO_Intensities)
+Oceania_Socialcosts = VegSocialCosts(Oceania_Diets, Oceania_Intensities)
+Russia_Socialcosts = VegSocialCosts(Russia_Diets, Russia_Intensities)
+SAS_Socialcosts = VegSocialCosts(SAS_Diets, SAS_Intensities)
+SSA_Socialcosts = VegSocialCosts(SSA_Diets, SSA_Intensities)
+WEU_Socialcosts = VegSocialCosts(WEU_Diets, WEU_Intensities)
 println("Analysis Done")
+
+include("DietsByCountry.jl")
+df = DietaryCostsByCountry()
+CSV.write("Figures//PNAS//CostsByCountry.csv", df)
+
+
+
+
 
 

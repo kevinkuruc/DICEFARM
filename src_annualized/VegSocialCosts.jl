@@ -1,4 +1,4 @@
-function VegSocialCosts(Intensities, Diets)
+function VegSocialCosts(Diets, Intensities)
 	include("DICEFARM_Annual.jl")
 	DICEFARM = create_dice_farm()
 	set_intensities(DICEFARM, Intensities)

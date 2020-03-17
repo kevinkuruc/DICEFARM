@@ -169,7 +169,7 @@ function optveg(x, grad)
 end
 
 opt = Opt(:LN_SBPLX, 1)
-opt.lower_bounds=[0.]
+opt.lower_bounds=[-1.0]
 opt.upper_bounds=[.9999999999]
 init = [.5]
 opt.xtol_rel = 1e-4
@@ -186,7 +186,7 @@ function optanimals(x, grad)
 	return result
 end
 opt = Opt(:LN_SBPLX, 3)
-opt.lower_bounds=zeros(3)
+opt.lower_bounds=-1*ones(3)
 opt.upper_bounds=ones(3)
 init = .75*ones(3)
 opt.xtol_rel = 1e-6
@@ -200,7 +200,8 @@ println("Reduce Chicken by $ChickenReduc")
 println("Reduce Pork by $PorkReduc")
 
 # --------- Optimal Policy with 2 dimensional robustness -------- #
-alphas 	= collect(.002: .0005: .008)
+alpha   = .025
+alphas 	= collect(.5*alpha: .25*alpha: 2*alpha)
 uAs 	= collect(.9:.1:1.9)
 
 DiffOpts = zeros(length(uAs), length(alphas))
@@ -229,7 +230,7 @@ end
 
 #plot(alphas, uAs, DiffOpts, legend=false, seriestype=:wireframe, size=[800,500], xlabel="Animal Welfare", ylabel="Marginal Utility Shifter");
 savefig("Figures//SCW//ThreeDRobustness.pdf")
-alphas = alphas/.004
+alphas = .5:.25:2
 plot(uAs, alphas, DiffOpts', seriestype=:heatmap, size=[800,500], xlabel="Animal Welfare (Human Eq. \$ per Day)", ylabel="Marginal Utility Shifter");
 savefig("Figures//SCW//HeatMapRobustness.svg")
 

@@ -4,7 +4,8 @@ include(joinpath("AnimalWelfareModel.jl"))
 
 ## First need to calibrate prices (via relative and total consumption of meat in our 2020 period)
 #Parameters nested within CES aggregator of meats
-epsilon = -1.22   #elasticity of substitution parameter
+#epsilon = -1.22   #elasticity of substitution parameter
+rho     = -1.22
 theta_c = .43  #coefficient within CES on chicken
 theta_b = .50
 theta_p = .07
@@ -28,26 +29,43 @@ Ytilde		= 1e12*TotC/Pop 	#Per capita total consumption to split between meat and
 PerCapChicken 	= Poultry/Pop
 PerCapBeef    	= Beef/Pop
 PerCapPork 		= Pork/Pop
-rho 			= (epsilon-1)/epsilon
+#rho 			= -1.22 #(epsilon-1)/epsilon
 m 				= ((theta_c*PerCapChicken^rho + theta_b*PerCapBeef^rho + theta_p*PerCapPork^rho)^(1/rho)) #Per cap CES of Meat
 
 ### Non Linear Solver for P and C
 f(x) = alpha*m^(-xi+1)*x^eta + x - Ytilde
 c = find_zero(f, (0, 11200), Bisection())
-P = alpha*m^(-xi)*c^(eta)
 
-## --- Now need price of each individual product --- ## (right?)
-function f!(F, x)
-	F[1] 	= (x[2]/x[1])^epsilon * (theta_c/theta_b)^epsilon - (PerCapChicken/PerCapBeef)
-	F[2]	= (x[3]/x[1])^epsilon * (theta_p/theta_b)^epsilon - (PerCapPork/PerCapBeef)
-	F[3] 	= (x[1]^(1-epsilon)*theta_b^epsilon + x[2]^(1-epsilon)*theta_c^epsilon + x[3]^(1-epsilon)*theta_p^epsilon )^(1/(1-epsilon)) - P
+epsilon = 1/(1-rho)
+## Write my own solver for individual Ps
+MeatExpenditure = Ytilde - c
+expen = 0
+global PBeef = 1000
+
+while expen < MeatExpenditure
+    global PBeef = PBeef + 1
+    global PPoultry= PBeef*(theta_c/theta_b)*(PerCapChicken/PerCapBeef)^(-1/epsilon)
+    global PPork = PBeef*(theta_p/theta_b)*(PerCapPork/PerCapBeef)^(-1/epsilon)
+    global expen   = PerCapBeef*PBeef + PerCapChicken*PPoultry + PerCapPork*PPork
 end
 
-sol = nlsolve(f!, [P; P; P])
-PriceVect = sol.zero
-PBeef 	  = PriceVect[1]
-PPoultry  = PriceVect[2]
-PPork 	  = PriceVect[3]
+
+
+#P = alpha*m^(-xi)*c^(eta)
+
+
+## --- Now need price of each individual product --- ## (right?)
+#function f!(F, x)
+#	F[1] 	= (x[2]/x[1])^epsilon * (theta_c/theta_b)^epsilon - (PerCapChicken/PerCapBeef)
+#	F[2]	= (x[3]/x[1])^epsilon * (theta_p/theta_b)^epsilon - (PerCapPork/PerCapBeef)
+#	F[3] 	= (x[1]^(1-epsilon)*theta_b^epsilon + x[2]^(1-epsilon)*theta_c^epsilon + x[3]^(1-epsilon)*theta_p^epsilon )^(1/(1-epsilon)) - P
+#end
+
+#sol = nlsolve(f!, [P; P; P])
+#PriceVect = sol.zero
+#PBeef 	  = PriceVect[1]
+#PPoultry  = PriceVect[2]
+#PPork 	  = PriceVect[3]
 
 
 function create_AnimalWelfareOpt()

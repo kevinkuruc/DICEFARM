@@ -139,7 +139,9 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year)
     set_param!(m, :emissions, :cumetree0,      p[:cumetree0])
     set_param!(m, :emissions, :MethERCP,       rcp_fossil_ch4[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
     set_param!(m, :emissions, :N2oERCP,        rcp_fossil_n2o[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
-    set_param!(m, :emissions, :CO2Marg,        p[:CO2Marg])
+    set_param!(m, :emissions, :Co2Pulse,        0)
+    set_param!(m, :emissions, :MethPulse,        0)
+    set_param!(m, :emissions, :N2oPulse,        0)    
     set_param!(m, :emissions, :DoubleCountCo2, p[:DoubleCountCo2])
     set_param!(m, :emissions, :ETREE,          annual_ETREE)
 
