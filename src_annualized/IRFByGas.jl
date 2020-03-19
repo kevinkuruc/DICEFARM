@@ -92,3 +92,34 @@ t = collect(2020:1:plotT)
 plot(t, [VeganIRF_CO2[TwentyTwenty:TwentyTwenty+length(t)-1] VeganIRF_Meth[TwentyTwenty:TwentyTwenty+length(t)-1] VeganIRF_N2O[TwentyTwenty:TwentyTwenty+length(t)-1]], legend=:topright, label=["CO2" "CH4" "N20"], linewidth=2, linestyle=[:dot :solid :dash], color=[:green :orange :black])
 
 plot(t, [VeganIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], legend=:topright, label=["Total"], linewidth=2, linestyle=[:solid], color=[:black])
+
+# --------- Interactions in FAIR -------------- #
+MethGigaTonne = create_dice_farm()
+set_param!(MethGigaTonne, :emissions, :MethPulse, 1/25*1e3)
+run(MethGigaTonne)
+MethGigaIRF = MethGigaTonne[:co2_cycle, :T] - BaseTemp
+
+N2oGigaTonne = create_dice_farm()
+set_param!(N2oGigaTonne, :emissions, :N2oPulse, 1/298*1e3)
+run(N2oGigaTonne)
+N2oGigaIRF = N2oGigaTonne[:co2_cycle, :T] - BaseTemp
+
+Co2GigaTonne = create_dice_farm()
+set_param!(Co2GigaTonne, :emissions, :Co2Pulse, 1)
+run(Co2GigaTonne)
+Co2GigaIRF = Co2GigaTonne[:co2_cycle, :T] - BaseTemp
+
+AllTonnes = create_dice_farm()
+set_param!(AllTonnes, :emissions, :Co2Pulse, 1)
+set_param!(AllTonnes, :emissions, :MethPulse, 1e3)
+set_param!(AllTonnes, :emissions, :N2oPulse, 1e3)
+run(AllTonnes)
+AllGigaIRF = AllTonnes[:co2_cycle, :T] - BaseTemp
+
+AddedIRFs  = MethGigaIRF + N2oGigaIRF + Co2GigaIRF
+
+plotT = 2120
+t = collect(2020:1:plotT)
+plot(t, [MethGigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1] N2oGigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1] Co2GigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], label=["Methane" "N2O" "CO2"])
+plot(t, [abs.(AllGigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1]-AddedIRFs[TwentyTwenty:TwentyTwenty+length(t)-1])./AllGigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1]], label=["% Error"], title="Percent Error is Small From Interaction Effects")
+plot(t, [AllGigaIRF[TwentyTwenty:TwentyTwenty+length(t)-1] AddedIRFs[TwentyTwenty:TwentyTwenty+length(t)-1]], linestyle=[:solid, :dash], label=["Interaction" "Independent"])
