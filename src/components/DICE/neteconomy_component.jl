@@ -27,7 +27,8 @@
         if is_first(t)
             v.PBACKTIME[t] = p.pback
         else
-            v.PBACKTIME[t] = v.PBACKTIME[t - 1] * (1 - p.gback)
+            newgback = (1+p.gback)^.2 - 1			#convert to annualized growth
+            v.PBACKTIME[t] = v.PBACKTIME[t - 1] * (1 - newgback)
         end
 		
 		#Define function for COSTL
@@ -49,7 +50,7 @@
         v.I[t] = p.S[t] * v.Y[t]
     
         #Define function for C
-        if t.t==2
+        if gettime(t)==2020
         v.C[t] = v.Y[t] - v.I[t] - p.CEQ
         else
         v.C[t] = v.Y[t] - v.I[t]

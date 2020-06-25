@@ -15,7 +15,7 @@
         if is_first(t)
             v.K[t] = p.k0
         else
-            v.K[t] = (1 - p.dk)^5 * v.K[t-1] + 5 * p.I[t-1]
+            v.K[t] = (1 - p.dk) * v.K[t-1] + p.I[t-1]		#dropped 5th power on depreciation & dropped 5*I
         end
 
         #Define function for YGROSS
