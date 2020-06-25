@@ -1,15 +1,5 @@
 # DICEFARM
 
-This code is all up and running on my desktop. 
+DICEFARM is used in two projects: (1) The high climate costs of animal based foods (EKM) and (2) Optimal Animal Agriculture Under Environmental and Population Externalities (SCW). 
 
-There is one hitch that maybe you know how to solve. So the main thing you'd have to run first is:
-"CalibratingDICEFARM.jl"  which sets everything up, and makes the function getcalibratedDICEFARM()
-
-But there is a versions problem on my machine, so I have to first run the function getDICEFARM() once before starting all of this. 
-
-All that is to say, this will run if you do the following:
-include("src\\DICEFARM.jl)
-getDICEFARM()
-include("src\\CalibratingDICEFARM.jl")
-m = getcalibratedDICEFARM()
-run(m)
+The model itself is constructed in DICEFARM.jl; and the modifications for SCW are located in "AnimalWefareModel.jl" in the "Subroutines_SCW" folder.
