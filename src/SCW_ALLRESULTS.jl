@@ -3,7 +3,6 @@ using Plots, NLopt, DataFrames, CSV
 directory = dirname(pwd())
 subroutine_directory = joinpath(directory, "src", "SubRoutines_SCW")
 output_directory = joinpath(directory, "Results", "SCW")
-mkpath(output_directory)
 
 include(joinpath(subroutine_directory, "AnimalWelfareModel.jl"))
 include(joinpath(subroutine_directory, "helpers_SCWOptimization.jl"))
@@ -161,6 +160,16 @@ AnWelfareCosts_Beef = SCs[2,1] - SCs[11,1]
 AnWelfareCosts_Pork = SCs[2,2] - SCs[11,2]
 AnWelfareCosts_Poultry = SCs[2,3] - SCs[11,3]
 
+Table2 = zeros(3, 4)
+Table2[1,1] = BenefitOfVegetarian[2]
+Table2[2,1] = BenefitOfVegetarian[11]
+Table2[3,1] = BenefitOfVegetarian[2] - BenefitOfVegetarian[11]
+Table2[1,2:4] = [Beefcost Porkcost Poultrycost]
+Table2[2,2:4] = [EnvironmentalBeefCost EnvironmentalPorkCost EnvironmentalPoultryCost]
+Table2[3,2:4] = [AnWelfareCosts_Beef AnWelfareCosts_Pork AnWelfareCosts_Poultry]
+Table2_df = DataFrame(NonVeg = Table2[:,1], Beef=Table2[:,2], Pork=Table2[:,3], Chicken=Table2[:,4])
+CSV.write(joinpath(output_directory, "Table2.csv"), Table2_df)
+
 plot(SufferingEquiv, SCs, color=[:brown :red :gold], label=["Beef" "Pork" "Poultry"], lw=[1.1], ylabel="Social Costs of Marginal Consumption (\$)", xlabel="Farmed Animal Utility (\$ per Day-Human Utility)")
 savefig(joinpath(output_directory, "ByAnimal.pdf"))
 
@@ -244,5 +253,7 @@ end
 
 plot(uAs, DiffOpts, linecolor=:red, lw=1.7, linestyle=[:solid :dashdot], label=["Baseline" "Increased Meat Utility"], xlabel="Animal Welfare", ylabel="Optimal Reduction", grid=false);
 savefig(joinpath(output_directory, "OneDimensionalRobustness.pdf"))
+Figure4 = DataFrame(column1 = uAs, column2 =DiffOpts[:,1], column3 = DiffOpts[:,2])
+CSV.write(joinpath(output_directory, "Figure4.csv"), Figure4)
 
 
