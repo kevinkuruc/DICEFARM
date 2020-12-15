@@ -194,7 +194,7 @@ TableS1[:SheepGoat] = [50*Diets[6]*Table1[1,9]]
 #CSV.write(joinpath(output_directory, "TableS1.csv"), TableS1)
 
 #-------- Figure 2 -------------------------------------- #
-#Isoquants()
+Isoquants()
 
 #--------- Loop Social Costs Over Region ---------------- #
 ESEA_Intensities 	= [49.9 8.85 .266	; 19.92 2.17 .069	; 35.7 .031 .049; 26.7 .81 .053	; 26.9 0.05 .039; 30.0 4.36 .13]
