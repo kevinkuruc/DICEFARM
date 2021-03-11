@@ -84,7 +84,7 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 		set_intensities(tempModel, Intensities)
 		set_param!(tempModel, :welfare, :rho, discount)
 		Pulse = copy(O)
-		Pulse[6] = Pulse[6] + 20000.0 #add 20 kg of protein (or 20000 grams)
+		Pulse[6] = Pulse[6] + 20000.0 #add 20,000 kg of protein (or 20,000,000 g---then 1000 deflated for C; 1000 more deflated 4 lines down) 
 		set_param!(tempModel, :farm, meat, Pulse)
 		run(tempModel)
 		W = tempModel[:welfare, :UTILITY]
