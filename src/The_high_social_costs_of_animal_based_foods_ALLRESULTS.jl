@@ -95,9 +95,9 @@ run(HHEnergyPulse)
 HHEnergyIRF = (HHEnergyPulse[:co2_cycle, :T] - BaseTemp)/1000
 PulsePlot = plot([2019;t], 1e12*[VeganIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] HHEnergyIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1]], legend=:topright,
  label=["Diet" "Passenger Vehicle" "Household Energy (Per Cap.)"], linewidth=2, linestyle=[:solid :dash :dashdot], color=[:green :black :orange],
-  ylabel="Temperature Change (1e-15 C)", ylims=(0,3.5), grid=false)
-#savefig(joinpath(output_directory, "Fig1B.pdf"))
-#savefig(joinpath(output_directory, "Fig1B.svg"))
+  ylabel="Temperature Change (1e-15 C)", ylims=(0,2.75), grid=false)
+savefig(joinpath(output_directory, "Fig1B.pdf"))
+savefig(joinpath(output_directory, "Fig1B.svg"))
 
 # -------- Total Social Costs --------------- #
 GlobalVeganPulse = create_dice_farm()
@@ -168,7 +168,7 @@ Table1_Col1 = [Table1_Col1; GlobalCosts_EPA[1];GlobalCosts_EPA[2]; GlobalCosts_E
 
 # -------- Social Costs (Baseline) ---------- #
 Diets = [4.5; 8; 6.5; 2.7; 1.6; .06];
-Intensities = [65.1 6.5 .22; 14.6 2.1 .22; 25.6 .02 .02; 25.1 .70 .03; 20.1 .07 .03; 20 4.5 .02];
+Intensities = [63.99 4.98 .229; 16.46 1.69 .078; 25.63 .02 .030; 25.12 .503 .043; 20.09 .052 .032; 22.45 3.72 .176];
 BaselineSCs = VegSocialCosts(Diets, Intensities)
 BaselineSCs_Stern = VegSocialCosts(Diets, Intensities, .001)
 EPAEsts     = VegSocialCosts_EPA(Diets, Intensities, EPA_discounts)
@@ -181,7 +181,7 @@ Table1[2,2:end] = BaselineSCs_Stern[:,2]
 Table1[3:end, 2:end] = EPAEsts
 Table1[:,3] = Table1[:,2]-Table1[:,3]
 Table1_df = DataFrame(Run = ["Base"; "Stern"; "2.5%"; "3%"; "5%"], Global = Table1[:,1], SAD = Table1[:,2], Vegetarian=Table1[:,3], Beef=Table1[:,4], Dairy=Table1[:,5], Poultry=Table1[:,6], Pork=Table1[:,7], Eggs=Table1[:,8], SheepGoat=Table1[:,9])
-CSV.write(joinpath(output_directory, "TableS2.csv"), Table1_df)
+CSV.write(joinpath(output_directory, "Table1.csv"), Table1_df)
 
 #-------- Table S1: Split Table 1 Base case by product -- #
 TableS1 = DataFrame()
@@ -194,19 +194,19 @@ TableS1[:SheepGoat] = [50*Diets[6]*Table1[1,9]]
 #CSV.write(joinpath(output_directory, "TableS1.csv"), TableS1)
 
 #-------- Figure 2 -------------------------------------- #
-Isoquants()
+#Isoquants()
 
 #--------- Loop Social Costs Over Region ---------------- #
-ESEA_Intensities 	= [49.9 8.85 .266	; 19.92 2.17 .069	; 35.7 .031 .049; 26.7 .81 .053	; 26.9 0.05 .039; 30.0 4.36 .13]
-EEU_Intensities  	= [29.9 2.11 .07	; 10.1 1.84 .03		; 14.4 .02 .02	; 25.1 .35 .03	; 8.2 .02 .03	; 14.3 1.84 .05]
-LatAm_Intensities 	= [141.84 7.89 .24	; 13.15 2.9 .24		; 25.44 .02 .02	; 27.4 .62 0.04	; 16.9 .17 .02	; 12.46 6.29 .13]
-MidEast_Intensities = [16.04 5.62 .43	; 14.9 3.48 .25		; 27.34 .02 .03	; 39.9 0.65 .04	; 14.2 .1 .02	; 24.3 5.32 .4]
-NO_Intensities 		= [14.08 3.67 .14	; 14.4 1.44 .02		; 14.35 .02 .02	; 15.24 .61 .02	; 7.57 .12 .02	; 22.3 4.17 .18]
-Oceania_Intensities = [21.7 4.39 .22	; 15.02 2.93 .10	; 28.4 .02 .02	; 25.02 2.01 .02; 12.8 .05 .02	; 16.25 2.93 .10]
-Russia_Intensities 	= [27.0 2.08 .06	; 8.8 1.23 .03		; 17.9  .02 .01	; 20.8  .28  .03; 9.08 .02  .01	; 13.06 4.14 .12]
-SAS_Intensities		= [58.46 12.7 .32	; 25.14 3.31 .10	; 21.5 1.52 .05	; 24.3 .02 .04	; 14.03 .07 .03	; 36.6 6.94 .16]
-SSA_Intensities 	= [5.9 11.3 .41		; 5.6 5.23 .16		; 28.5 .04 .03	; 13.3 1.17 .04	; 10.8 .08 .04	; 6.28 7.28 .20]
-WEU_Intensities		= [26.4 2.6 .12		; 12.2 0.99 .04		; 23.9 .02 .02	; 27.2 .46 .04	; 15.2 .02 .02	; 18.9 2.44 .09]
+ESEA_Intensities    = [49.9 6.51 .27    ; 19.9 1.60 .07     ; 35.7 .02 .05	; 26.7 .60 .05 ; 26.9 .04 .04  	; 30.0 3.20 .13]
+EEU_Intensities     = [29.9 1.55 .07    ; 10.1 0.84 .03     ; 14.4 .01 .02 	; 25.1 .27 .03  ; 8.2 .01 .03   ; 14.3 1.35 .05]
+LatAm_Intensities   = [141.8 5.80 .24   ; 13.1 2.14 .24     ; 25.4 .01 .02 	; 27.4 .46 .04 ; 16.9 .13 .02  ; 12.5 4.62 .13]
+MidEast_Intensities = [16.0 4.13  .43   ; 14.9 2.60 .25     ; 27.3 .02 .03  ; 39.9 .48 .04 ; 14.2 .08 .02  ; 24.3 3.91 .40]
+NO_Intensities      = [14.1 2.70 .14    ; 14.4 1.06 .02     ; 14.4 .01 .02 	; 15.2 .45 .02 ; 7.6 .09 .02   ; 22.3 3.06 .18]
+Oceania_Intensities = [21.7 3.23 .22    ; 15.0 0.80 .05     ; 28.4 .02 .02  ; 25.0 1.47 .02 ; 12.8 .03 .02  ; 16.3 2.15 .10]
+Russia_Intensities  = [27.0 1.53 .06    ; 8.8 0.90 .03      ; 17.9 .01 .01  ; 20.8  .20  .03; 9.1 .02  .01  ; 13.0 3.04 .12]
+SAS_Intensities     = [58.5 9.33 .32    ; 25.1 2.4 .10      ; 24.3 .02 .04  ; 21.5 1.12 .05 ; 14.0 .05 .03  ; 36.6 5.10 .16]
+SSA_Intensities     = [5.9 8.31 .41     ; 5.6 3.84 .16      ; 28.5 .03 .03  ; 13.3 0.86 .04 ; 10.8 .06 .04  ; 6.3 5.35 .20]
+WEU_Intensities     = [26.4 1.91 .12    ; 12.2 0.73 .04     ; 23.9 .01 .02  ; 27.2 .34 .04  ; 15.2 .02 .02  ; 18.9 1.79 .09]
 
 # We dont actually use these in final paper... but still need them as place holders for Region_Socialcosts() function
 ESEA_Diets 		= [.67	; 1.1	; 1.5; 4.0	; 2.1 ; .40] #China
@@ -237,7 +237,7 @@ Region = repeat(["Africa", "East\nAsia", "East\nEurope", "Lat\nAm.", "Mid\nEast"
 Product = repeat(["Beef", "Dairy", "Poultry", "Pork", "Eggs", "Sheep/Goat"], inner=10)
 BarData = [SSA_Socialcosts[3:end,2] ESEA_Socialcosts[3:end,2] EEU_Socialcosts[3:end,2] LatAm_Socialcosts[3:end,2] MidEast_Socialcosts[3:end,2] NO_Socialcosts[3:end,2] Oceania_Socialcosts[3:end,2] Russia_Socialcosts[3:end,2] SAS_Socialcosts[3:end,2] WEU_Socialcosts[3:end,2]]'
 groupedbar(Region, BarData, group=Product, grid=false, color=[:black :blue :yellow :pink :red :brown],
-foreground_color_legend = nothing, background_color_legend=nothing, legendfontsize=6, ylabel="Cost per 20 g protein serving (\$)")
+foreground_color_legend = nothing, background_color_legend=nothing, legend=(0.9,0.9), legendfontsize=6, ylabel="Cost per 20 g protein serving (\$)")
 #savefig(joinpath(output_directory, "Fig3B.pdf"))
 #savefig(joinpath(output_directory, "Fig3B.svg"))
 
@@ -254,7 +254,7 @@ foreground_color_legend = nothing, background_color_legend=nothing, legendfontsi
 #Then simply re-run the master file and you will get updates. The model will obnoxiously tell you 
 #that you are running the model this way so that you don't forget to change back annual_parameters.jl
 
-#---- Appendix Table 2 ------------------------------#
+#---- Appendix Table 3 ------------------------------#
 #redo analysis changing the input of create_dice_farm(TCR=1.6, ECS=2.75)
 
 
