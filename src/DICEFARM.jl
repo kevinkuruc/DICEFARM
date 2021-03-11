@@ -32,10 +32,10 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
         # Create "backup" emissions scenarios to run FAIR for periods before 2015 (after which DICEFARM kicks in).
         # NOTE: Interpolating from 2010-2015 for CO2 so no jumps between RCP and DICE CO2 scenarios (CH4 and N2O follow RCP).
         run(m)
-        rcp_landuse_co2 = m[:landuse_rf, :landuse_emiss] # landuse only used for albedo change forcing (GtC)
+        rcp_landuse_co2 = m[:landuse_rf, :landuse_emissions] # landuse only used for albedo change forcing (GtC)
         rcp_total_co2   = m[:co2_cycle, :E]  # Total FAIR CO2 emissions = fossil + landuse (GtC)
-        rcp_fossil_ch4  = m[:ch4_cycle, :CH₄_fossil_emiss] #Mt CH4/yr
-        rcp_fossil_n2o  = m[:n2o_cycle, :N₂O_fossil_emiss] #Mt N/yr (but double check this unit)
+        rcp_fossil_ch4  = m[:ch4_cycle, :CH₄_fossil_emissions] #Mt CH4/yr
+        rcp_fossil_n2o  = m[:n2o_cycle, :N₂O_fossil_emissions] #Mt N/yr (but double check this unit)
 
         # Just hard-coding this in for now... DICE2016 industrial CO2 emissions in 2015 (not affected by policy) units = GtC.
         dice_fossilco2_2015  = 9.754465143940621
@@ -90,17 +90,24 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     #-----------------------------------------------------------------------
     # Set Exogenous Component Parameters
     #-----------------------------------------------------------------------
+
+    # Pad the parameters so they have the time length of the full model, not just DICE
+    p = pad_parameters(p, end_year - start_dice_year + 1, start_dice_year - start_year, 0)
+
+    # ----- Parameters Common to Multiple Components ----- #
+    set_param!(m, :l,       p[:l]) # grosseconomy, neteconomy, and welfare
+    set_param!(m, :MIU,     pad_parameter(annual_MIU, end_year - start_dice_year + 1, start_dice_year - start_year, 0)) # emissions and neteconomy
+
     # ----- Total Factor Productivity ------ #
     #set_param!(m, :totalfactorproductivity, :a0,    p[:a0])
     #set_param!(m, :totalfactorproductivity, :ga0, p[:ga0])
     #set_param!(m, :totalfactorproductivity, :dela,   p[:dela]) 
 
     # ----- Gross Economy ----- #
-    set_param!(m, :grosseconomy, :l,    p[:l])
     set_param!(m, :grosseconomy, :gama, p[:gama])
     set_param!(m, :grosseconomy, :dk,   0.0819)  #Comes from changing DICE to annual
     set_param!(m, :grosseconomy, :k0,   p[:k0])
-    set_param!(m, :grosseconomy, :AL,   annual_TFP)
+    set_param!(m, :grosseconomy, :AL,   pad_parameter(annual_TFP, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
 
     # ----- Agriculture Emissions ----- #
     set_param!(m, :farm, :Beef,               p[:Beef])
@@ -133,17 +140,16 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     set_param!(m, :emissions, :gsigma1,        p[:gsigma1])
     set_param!(m, :emissions, :dsig,           p[:dsig])
     set_param!(m, :emissions, :e0,             p[:e0])
-    set_param!(m, :emissions, :MIU,            annual_MIU)
     set_param!(m, :emissions, :EIndReduc,      p[:EIndReduc])
     set_param!(m, :emissions, :cca0,           p[:cca0])
     set_param!(m, :emissions, :cumetree0,      p[:cumetree0])
-    set_param!(m, :emissions, :MethERCP,       rcp_fossil_ch4[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
-    set_param!(m, :emissions, :N2oERCP,        rcp_fossil_n2o[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
-    set_param!(m, :emissions, :Co2Pulse,        0)
-    set_param!(m, :emissions, :MethPulse,        0)
-    set_param!(m, :emissions, :N2oPulse,        0)    
+    set_param!(m, :emissions, :MethERCP,       rcp_fossil_ch4) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
+    set_param!(m, :emissions, :N2oERCP,        rcp_fossil_n2o) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
+    set_param!(m, :emissions, :Co2Pulse,       0)
+    set_param!(m, :emissions, :MethPulse,      0)
+    set_param!(m, :emissions, :N2oPulse,       0)    
     set_param!(m, :emissions, :DoubleCountCo2, p[:DoubleCountCo2])
-    set_param!(m, :emissions, :ETREE,          annual_ETREE)
+    set_param!(m, :emissions, :ETREE,          pad_parameter(annual_ETREE, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
 
     # ----- Climate Damages ----- #
     set_param!(m, :damages, :a1, p[:a1])
@@ -151,16 +157,13 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     set_param!(m, :damages, :a3, p[:a3])
 
     # ----- Net Economy ----- #
-    set_param!(m, :neteconomy, :MIU,      annual_MIU)
     set_param!(m, :neteconomy, :expcost2, p[:expcost2])
     set_param!(m, :neteconomy, :pback,    p[:pback])
     set_param!(m, :neteconomy, :gback,    p[:gback])
-    set_param!(m, :neteconomy, :S,        annual_savings)
-    set_param!(m, :neteconomy, :l,        p[:l])
+    set_param!(m, :neteconomy, :S,        pad_parameter(annual_savings, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
     set_param!(m, :neteconomy, :CEQ,      p[:CEQ])
 
     # ----- Welfare ----- #
-    set_param!(m, :welfare, :l,         p[:l])
     set_param!(m, :welfare, :elasmu,    p[:elasmu])
     set_param!(m, :welfare, :rho,       p[:rho])
     set_param!(m, :welfare, :scale1,    p[:scale1])
@@ -180,9 +183,9 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     # Couple DICE-FARM and FAIR components.
     # Note: DICE-FARM runs from 2015-2500. FAIR runs from 1765-2500. FAIR therefore uses historical RCP emissions, then switches to endogenous DICE-FARM emissions in 2015.
     connect_param!(m, :co2_cycle  => :E,                :emissions => :total_CO₂emiss_GtC,   backup_total_RCPco2)
-    connect_param!(m, :ch4_cycle  => :CH₄_fossil_emiss, :emissions => :MethE,                backup_fossil_RCPch4)
-    connect_param!(m, :n2o_cycle  => :N₂O_fossil_emiss, :emissions => :N2oE,                 backup_fossil_RCPn2o)
-    connect_param!(m, :landuse_rf => :landuse_emiss,    :emissions => :landuse_CO₂emiss_GtC, backup_landuse_RCPco2)
+    connect_param!(m, :ch4_cycle  => :CH₄_fossil_emissions, :emissions => :MethE,                backup_fossil_RCPch4)
+    connect_param!(m, :n2o_cycle  => :N₂O_fossil_emissions, :emissions => :N2oE,                 backup_fossil_RCPn2o)
+    connect_param!(m, :landuse_rf => :landuse_emissions,    :emissions => :landuse_CO₂emiss_GtC, backup_landuse_RCPco2)
 
     connect_param!(m, :damages, :TATM,   :temperature,  :T)
     connect_param!(m, :damages, :YGROSS, :grosseconomy, :YGROSS)
