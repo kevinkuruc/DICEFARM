@@ -1,6 +1,6 @@
 function DietaryCostsByCountry()
 
-d= CSV.read(joinpath(data_directory, "2013Diets.csv"))
+d= CSV.read(joinpath(data_directory, "2013Diets.csv"), DataFrame)
 VegCosts = zeros(size(d)[1], 2)
 ESEA_Intensities    = [49.9 6.51 .27    ; 19.9 1.60 .07     ; 35.7 .02 .05  ; 26.7 .60 .05 ; 26.9 .04 .04   ; 30.0 3.20 .13]
 EEU_Intensities     = [29.9 1.55 .07    ; 10.1 0.84 .03     ; 14.4 .01 .02  ; 25.1 .27 .03  ; 8.2 .01 .03   ; 14.3 1.35 .05]

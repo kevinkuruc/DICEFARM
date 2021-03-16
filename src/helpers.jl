@@ -79,24 +79,56 @@ end
 #           intesities  = 6x3 Matrix of emissions intensities for: Beef, Dairy, Poultry, Pork, Eggs, Sheep/Goats; Co2, CH4, N20
 #------------------------------------------------------------------------------------------------------------------------
 
-function set_intensities(m, intensities)
-    set_param!(m, :farm, :sigmaBeefCo2, intensities[1,1])    
-    set_param!(m, :farm, :sigmaBeefMeth, intensities[1,2])
-    set_param!(m, :farm, :sigmaBeefN2o, intensities[1,3])
-    set_param!(m, :farm, :sigmaDairyCo2, intensities[2,1])
-    set_param!(m, :farm, :sigmaDairyMeth, intensities[2,2])
-    set_param!(m, :farm, :sigmaDairyN2o, intensities[2,3])
-    set_param!(m, :farm, :sigmaPoultryCo2, intensities[3,1])
-    set_param!(m, :farm, :sigmaPoultryMeth, intensities[3,2])
-    set_param!(m, :farm, :sigmaPoultryN2o, intensities[3,3])
-    set_param!(m, :farm, :sigmaPorkCo2, intensities[4,1])
-    set_param!(m, :farm, :sigmaPorkMeth, intensities[4,2])
-    set_param!(m, :farm, :sigmaPorkN2o, intensities[4,3])
-    set_param!(m, :farm, :sigmaEggsCo2, intensities[5,1])
-    set_param!(m, :farm, :sigmaEggsMeth, intensities[5,2])
-    set_param!(m, :farm, :sigmaEggsN2o, intensities[5,3]) 
-    set_param!(m, :farm, :sigmaSheepGoatCo2, intensities[6,1])
-    set_param!(m, :farm, :sigmaSheepGoatMeth, intensities[6,2])
-    set_param!(m, :farm, :sigmaSheepGoatN2o, intensities[6,3])  
+function update_intensities(m, intensities)
+    update_param!(m, :sigmaBeefCo2, intensities[1,1])    
+    update_param!(m, :sigmaBeefMeth, intensities[1,2])
+    update_param!(m, :sigmaBeefN2o, intensities[1,3])
+    update_param!(m, :sigmaDairyCo2, intensities[2,1])
+    update_param!(m, :sigmaDairyMeth, intensities[2,2])
+    update_param!(m, :sigmaDairyN2o, intensities[2,3])
+    update_param!(m, :sigmaPoultryCo2, intensities[3,1])
+    update_param!(m, :sigmaPoultryMeth, intensities[3,2])
+    update_param!(m, :sigmaPoultryN2o, intensities[3,3])
+    update_param!(m, :sigmaPorkCo2, intensities[4,1])
+    update_param!(m, :sigmaPorkMeth, intensities[4,2])
+    update_param!(m, :sigmaPorkN2o, intensities[4,3])
+    update_param!(m, :sigmaEggsCo2, intensities[5,1])
+    update_param!(m, :sigmaEggsMeth, intensities[5,2])
+    update_param!(m, :sigmaEggsN2o, intensities[5,3]) 
+    update_param!(m, :sigmaSheepGoatCo2, intensities[6,1])
+    update_param!(m, :sigmaSheepGoatMeth, intensities[6,2])
+    update_param!(m, :sigmaSheepGoatN2o, intensities[6,3])  
 end
 
+
+# Function to make sure lengths align for different length timestep Mimi components.
+function pad_parameters(p::Dict, time_len::Int,  begin_padding::Number, end_padding::Number)
+
+    padded_p = deepcopy(p)
+
+    for key in keys(p)
+        values = p[key]
+        size(values,1) == time_len ? padded_p[key] = pad_parameter(values, time_len, begin_padding, end_padding) :  padded_p[key] = values
+    end
+
+    return padded_p
+end
+
+function pad_parameter(data::Array, time_len::Number, begin_padding::Number, end_padding::Number)
+    size(data, 1) != time_len ? error("time dimension must match rows") : nothing
+
+    new_data = deepcopy(data)
+    if begin_padding != 0
+        begin_padding_rows = Array{Union{Missing, Number}}(missing, begin_padding, size(data, 2)) 
+        new_data = vcat(begin_padding_rows, new_data)
+    end
+
+    if end_padding != 0
+        end_padding_rows = Array{Union{Missing, Number}}(missing, end_padding, size(data, 2)) 
+        new_data = vcat(new_data, end_padding_rows)
+    end
+
+    ndims(data) == 1 ? new_data = new_data[:,1] : nothing 
+
+    return new_data
+end

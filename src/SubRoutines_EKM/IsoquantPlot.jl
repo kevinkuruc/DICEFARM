@@ -2,6 +2,7 @@ function Isoquants()
 isotemps = [1.5 2 2.5 3]
 MReduc1 = collect(0:.02:1) #change back to 0.02 for main figure
 EIndReduc1 = zeros(length(MReduc1), length(isotemps))
+m = create_dice_farm()
 for MAXTEMP = 1:length(isotemps)
 	println("Finished a temp!")
 	for j = 1:length(MReduc1)
@@ -10,9 +11,8 @@ for MAXTEMP = 1:length(isotemps)
 		maxtemp = 1.
 			while maxtemp<isotemps[MAXTEMP]
 			Co2Reduc = Co2Reduc - CO2step
-			m = create_dice_farm();
-			set_param!(m, :farm, :MeatReduc, MReduc1[j])
-			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
+			update_param!(m, :MeatReduc, MReduc1[j])
+			update_param!(m, :EIndReduc, Co2Reduc)
 			run(m) 
 			temp = m[:co2_cycle, :T]
 			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+100])  #temp in next 100 years
