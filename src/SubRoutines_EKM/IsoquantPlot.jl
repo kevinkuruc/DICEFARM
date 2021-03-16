@@ -11,8 +11,8 @@ for MAXTEMP = 1:length(isotemps)
 			while maxtemp<isotemps[MAXTEMP]
 			Co2Reduc = Co2Reduc - CO2step
 			m = create_dice_farm();
-			set_param!(m, :farm, :MeatReduc, MReduc1[j])
-			set_param!(m, :emissions, :EIndReduc, Co2Reduc)
+			update_param!(m, :MeatReduc, MReduc1[j])
+			update_param!(m, :EIndReduc, Co2Reduc)
 			run(m) 
 			temp = m[:co2_cycle, :T]
 			maxtemp = maximum(temp[TwentyTwenty:TwentyTwenty+100])  #temp in next 100 years

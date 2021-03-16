@@ -31,12 +31,12 @@ OrigEggs = DICEFARM[:farm, :Eggs]
 OrigSheepGoat = DICEFARM[:farm, :SheepGoat]
 
 VeganDICE = create_dice_farm()
-set_param!(VeganDICE, :farm, :Beef, [OrigBeef[1:5]; zeros(DICELength-5)])  			#Keep 2015-2019 consumption
-set_param!(VeganDICE, :farm, :Dairy, [OrigDairy[1:5]; zeros(DICELength-5)])
-set_param!(VeganDICE, :farm, :Poultry, [OrigPoultry[1:5]; zeros(DICELength-5)])
-set_param!(VeganDICE, :farm, :Pork, [OrigPork[1:5]; zeros(DICELength-5)])
-set_param!(VeganDICE, :farm, :Eggs, [OrigEggs[1:5]; zeros(DICELength-5)])
-set_param!(VeganDICE, :farm, :SheepGoat, [OrigSheepGoat[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :Beef, [OrigBeef[1:5]; zeros(DICELength-5)])  			#Keep 2015-2019 consumption
+update_param!(VeganDICE, :Dairy, [OrigDairy[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :Poultry, [OrigPoultry[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :Pork, [OrigPork[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :Eggs, [OrigEggs[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :SheepGoat, [OrigSheepGoat[1:5]; zeros(DICELength-5)])
 run(VeganDICE)
 VeganTemp = VeganDICE[:co2_cycle, :T]
 plotT = 2120
@@ -46,8 +46,8 @@ println("Temp Diff is $TempDiff")
 TotalPlot = plot(t, [BaseTemp[TwentyTwenty:TwentyTwenty+length(t)-1] VeganTemp[TwentyTwenty:TwentyTwenty+length(t)-1]], linewidth=2, 
 	linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash], grid=false,
 	 ylabel="Temperature Increase (C Above Pre-Industrial)")
-#savefig(joinpath(output_directory, "Fig1A.pdf"))
-#savefig(joinpath(output_directory, "Fig1A.svg"))
+savefig(joinpath(output_directory, "Fig1A.pdf"))
+savefig(joinpath(output_directory, "Fig1A.svg"))
 
 # ------ Plot Vegan Pulse vs Gas Pulse: Figure 1B ------- #
 
@@ -68,12 +68,12 @@ SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(.06)
 
 #Model With Vegan Pulse
 VeganPulse = create_dice_farm()
-set_param!(VeganPulse, :farm, :Beef, BeefPulse)
-set_param!(VeganPulse, :farm, :Dairy, DairyPulse)
-set_param!(VeganPulse, :farm, :Poultry, PoultryPulse)
-set_param!(VeganPulse, :farm, :Pork, PorkPulse)
-set_param!(VeganPulse, :farm, :Eggs, EggsPulse)
-set_param!(VeganPulse, :farm, :SheepGoat, SheepGoatPulse)
+update_param!(VeganPulse, :Beef, BeefPulse)
+update_param!(VeganPulse, :Dairy, DairyPulse)
+update_param!(VeganPulse, :Poultry, PoultryPulse)
+update_param!(VeganPulse, :Pork, PorkPulse)
+update_param!(VeganPulse, :Eggs, EggsPulse)
+update_param!(VeganPulse, :SheepGoat, SheepGoatPulse)
 run(VeganPulse)
 VeganIRF = (VeganPulse[:co2_cycle, :T] - BaseTemp)/1000
 
@@ -90,7 +90,7 @@ T = DICELength
 pulse = 1000*8.67/2.63*1e-9  
 #8.67 from: https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references
 #2.63 from: https://www.pewresearch.org/fact-tank/2019/10/01/the-number-of-people-in-the-average-u-s-household-is-going-up-for-the-first-time-in-over-160-years/
-set_param!(HHEnergyPulse, :emissions, :Co2Pulse, pulse)
+update_param!(HHEnergyPulse, :Co2Pulse, pulse)
 run(HHEnergyPulse)
 HHEnergyIRF = (HHEnergyPulse[:co2_cycle, :T] - BaseTemp)/1000
 PulsePlot = plot([2019;t], 1e12*[VeganIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] HHEnergyIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1]], legend=:topright,
@@ -116,20 +116,20 @@ GlobalPoultryPulse[6] = 0
 GlobalEggsPulse[6] = 0
 GlobalSheepGoatPulse[6] = 0
 
-set_param!(GlobalVeganPulse, :farm, :Beef, GlobalBeefPulse)
-set_param!(GlobalVeganPulse, :farm, :Dairy, GlobalDairyPulse)
-set_param!(GlobalVeganPulse, :farm, :Poultry, GlobalPoultryPulse)
-set_param!(GlobalVeganPulse, :farm, :Pork, GlobalPorkPulse)
-set_param!(GlobalVeganPulse, :farm, :Eggs, GlobalEggsPulse)
-set_param!(GlobalVeganPulse, :farm, :SheepGoat, GlobalSheepGoatPulse)
+update_param!(GlobalVeganPulse, :Beef, GlobalBeefPulse)
+update_param!(GlobalVeganPulse, :Dairy, GlobalDairyPulse)
+update_param!(GlobalVeganPulse, :Poultry, GlobalPoultryPulse)
+update_param!(GlobalVeganPulse, :Pork, GlobalPorkPulse)
+update_param!(GlobalVeganPulse, :Eggs, GlobalEggsPulse)
+update_param!(GlobalVeganPulse, :SheepGoat, GlobalSheepGoatPulse)
 
-set_param!(GlobalVeganPulse_Stern, :farm, :Beef, GlobalBeefPulse)
-set_param!(GlobalVeganPulse_Stern, :farm, :Dairy, GlobalDairyPulse)
-set_param!(GlobalVeganPulse_Stern, :farm, :Poultry, GlobalPoultryPulse)
-set_param!(GlobalVeganPulse_Stern, :farm, :Pork, GlobalPorkPulse)
-set_param!(GlobalVeganPulse_Stern, :farm, :Eggs, GlobalEggsPulse)
-set_param!(GlobalVeganPulse_Stern, :farm, :SheepGoat, GlobalSheepGoatPulse)
-set_param!(GlobalVeganPulse_Stern, :welfare, :rho, .001)
+update_param!(GlobalVeganPulse_Stern, :Beef, GlobalBeefPulse)
+update_param!(GlobalVeganPulse_Stern, :Dairy, GlobalDairyPulse)
+update_param!(GlobalVeganPulse_Stern, :Poultry, GlobalPoultryPulse)
+update_param!(GlobalVeganPulse_Stern, :Pork, GlobalPorkPulse)
+update_param!(GlobalVeganPulse_Stern, :Eggs, GlobalEggsPulse)
+update_param!(GlobalVeganPulse_Stern, :SheepGoat, GlobalSheepGoatPulse)
+update_param!(GlobalVeganPulse_Stern, :rho, .001)
 
 run(GlobalVeganPulse)
 run(GlobalVeganPulse_Stern)
@@ -140,15 +140,15 @@ NewBaseline = create_dice_farm()
 
 function ConsEquiv(m, W, discount=.015)
 	function f(x)
-		set_param!(m, :neteconomy, :CEQ, x)
-		set_param!(m, :welfare, :rho, discount)
+		update_param!(m, :CEQ, x)
+		update_param!(m, :rho, discount)
 		run(m)
 		diff = m[:welfare, :UTILITY] - W
 		return diff
 	end
-CEQ = find_zero(f, (-1, 1), Bisection())
-CEQ = CEQ
-return CEQ
+	CEQ = find_zero(f, (-1, 1), Bisection())
+	CEQ = CEQ
+	return CEQ
 end
 
 GlobalPulseCost = -1000*ConsEquiv(NewBaseline, WGlobalPulse) #convert from trillions to billions
@@ -185,16 +185,16 @@ CSV.write(joinpath(output_directory, "Table1.csv"), Table1_df)
 
 #-------- Table S1: Split Table 1 Base case by product -- #
 TableS1 = DataFrame()
-TableS1[:Beef] = [50*Diets[1]*Table1[1,4]] #1 kg is 50 20g servings
-TableS1[:Dairy] = [50*Diets[2]*Table1[1,5]]
-TableS1[:Poultry] = [50*Diets[3]*Table1[1,6]]
-TableS1[:Pork] = [50*Diets[4]*Table1[1,7]]
-TableS1[:Eggs] = [50*Diets[5]*Table1[1,8]]
-TableS1[:SheepGoat] = [50*Diets[6]*Table1[1,9]]
+TableS1[!,:Beef] = [50*Diets[1]*Table1[1,4]] #1 kg is 50 20g servings
+TableS1[!,:Dairy] = [50*Diets[2]*Table1[1,5]]
+TableS1[!,:Poultry] = [50*Diets[3]*Table1[1,6]]
+TableS1[!,:Pork] = [50*Diets[4]*Table1[1,7]]
+TableS1[!,:Eggs] = [50*Diets[5]*Table1[1,8]]
+TableS1[!,:SheepGoat] = [50*Diets[6]*Table1[1,9]]
 #CSV.write(joinpath(output_directory, "TableS1.csv"), TableS1)
 
 #-------- Figure 2 -------------------------------------- #
-#Isoquants()
+Isoquants()
 
 #--------- Loop Social Costs Over Region ---------------- #
 ESEA_Intensities    = [49.9 6.51 .27    ; 19.9 1.60 .07     ; 35.7 .02 .05	; 26.7 .60 .05 ; 26.9 .04 .04  	; 30.0 3.20 .13]
@@ -238,12 +238,12 @@ Product = repeat(["Beef", "Dairy", "Poultry", "Pork", "Eggs", "Sheep/Goat"], inn
 BarData = [SSA_Socialcosts[3:end,2] ESEA_Socialcosts[3:end,2] EEU_Socialcosts[3:end,2] LatAm_Socialcosts[3:end,2] MidEast_Socialcosts[3:end,2] NO_Socialcosts[3:end,2] Oceania_Socialcosts[3:end,2] Russia_Socialcosts[3:end,2] SAS_Socialcosts[3:end,2] WEU_Socialcosts[3:end,2]]'
 groupedbar(Region, BarData, group=Product, grid=false, color=[:black :blue :yellow :pink :red :brown],
 foreground_color_legend = nothing, background_color_legend=nothing, legend=(0.9,0.9), legendfontsize=6, ylabel="Cost per 20 g protein serving (\$)")
-#savefig(joinpath(output_directory, "Fig3B.pdf"))
-#savefig(joinpath(output_directory, "Fig3B.svg"))
+savefig(joinpath(output_directory, "Fig3B.pdf"))
+savefig(joinpath(output_directory, "Fig3B.svg"))
 
 #------- Figure 3A -----------------#
-#df = DietaryCostsByCountry()
-#CSV.write(joinpath(output_directory, "CostsByCountry.csv"), df)
+df = DietaryCostsByCountry()
+CSV.write(joinpath(output_directory, "CostsByCountry.csv"), df)
 
 
 #---- Appendix Figures: Increased PC Meat Cons ----- #

@@ -1,13 +1,13 @@
 function VegSocialCosts(Diets, Intensities, discount=.015)
 	DICEFARM = create_dice_farm()
-	set_intensities(DICEFARM, Intensities)
-	set_param!(DICEFARM, :welfare, :rho, discount)
+	update_intensities(DICEFARM, Intensities)
+	update_param!(DICEFARM, :rho, discount)
 	run(DICEFARM)
 	BaseWelfare = DICEFARM[:welfare, :UTILITY]
 	MargCons 	= create_dice_farm()
-	set_intensities(MargCons, Intensities)
-	set_param!(MargCons, :welfare, :rho, discount)
-	set_param!(MargCons, :neteconomy, :CEQ, 1e-9)  #dropping C by 1000 total
+	update_intensities(MargCons, Intensities)
+	update_param!(MargCons, :rho, discount)
+	update_param!(MargCons, :CEQ, 1e-9)  #dropping C by 1000 total
 	run(MargCons)
 	MargConsWelfare = MargCons[:welfare, :UTILITY]
 	SCNumeraire 	= BaseWelfare - MargConsWelfare
@@ -38,14 +38,14 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 	SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(Diets[6])
 
 	VeganPulse = create_dice_farm()
-	set_intensities(VeganPulse, Intensities)
-	set_param!(VeganPulse, :welfare, :rho, discount)
-	set_param!(VeganPulse, :farm, :Beef, BeefPulse)
-	set_param!(VeganPulse, :farm, :Dairy, DairyPulse)
-	set_param!(VeganPulse, :farm, :Poultry, PoultryPulse)
-	set_param!(VeganPulse, :farm, :Pork, PorkPulse)
-	set_param!(VeganPulse, :farm, :Eggs, EggsPulse)
-	set_param!(VeganPulse, :farm, :SheepGoat, SheepGoatPulse)
+	update_intensities(VeganPulse, Intensities)
+	update_param!(VeganPulse, :rho, discount)
+	update_param!(VeganPulse, :Beef, BeefPulse)
+	update_param!(VeganPulse, :Dairy, DairyPulse)
+	update_param!(VeganPulse, :Poultry, PoultryPulse)
+	update_param!(VeganPulse, :Pork, PorkPulse)
+	update_param!(VeganPulse, :Eggs, EggsPulse)
+	update_param!(VeganPulse, :SheepGoat, SheepGoatPulse)
 	run(VeganPulse)
 
 	VegWelfare = VeganPulse[:welfare, :UTILITY]
@@ -63,12 +63,12 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 	SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(Diets[6])
 
 	VegetarianPulse = create_dice_farm()
-	set_intensities(VegetarianPulse, Intensities)
-	set_param!(VegetarianPulse, :welfare, :rho, discount)
-	set_param!(VegetarianPulse, :farm, :Beef, BeefPulse)
-	set_param!(VegetarianPulse, :farm, :Poultry, PoultryPulse)
-	set_param!(VegetarianPulse, :farm, :Pork, PorkPulse)
-	set_param!(VegetarianPulse, :farm, :SheepGoat, SheepGoatPulse)
+	update_intensities(VegetarianPulse, Intensities)
+	update_param!(VegetarianPulse, :rho, discount)
+	update_param!(VegetarianPulse, :Beef, BeefPulse)
+	update_param!(VegetarianPulse, :Poultry, PoultryPulse)
+	update_param!(VegetarianPulse, :Pork, PorkPulse)
+	update_param!(VegetarianPulse, :SheepGoat, SheepGoatPulse)
 	run(VegetarianPulse)
 
 	Veg2Welfare = VegetarianPulse[:welfare, :UTILITY]
@@ -81,11 +81,11 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 	i = collect(1:1:length(Meats))
 	for (meat, O, i) in zip(Meats, Origs, i)
 		tempModel = create_dice_farm();
-		set_intensities(tempModel, Intensities)
-		set_param!(tempModel, :welfare, :rho, discount)
+		update_intensities(tempModel, Intensities)
+		update_param!(tempModel, :rho, discount)
 		Pulse = copy(O)
 		Pulse[6] = Pulse[6] + 20000.0 #add 20,000 kg of protein (or 20,000,000 g---then 1000 deflated for C; 1000 more deflated 4 lines down) 
-		set_param!(tempModel, :farm, meat, Pulse)
+		update_param!(tempModel, meat, Pulse)
 		run(tempModel)
 		W = tempModel[:welfare, :UTILITY]
 		SocialCosts[i+2] = 1e-3*(BaseWelfare - W)/SCNumeraire 
