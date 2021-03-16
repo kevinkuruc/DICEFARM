@@ -218,20 +218,18 @@ function create_dice_farm(;start_year=1765, end_year=2500, start_dice_year=2015,
     run(dice_farm)
 
     # Need to subtract endogenous FARM CO₂ emissions from exogenous DICE land-use emissions to avoid double-counting.
-    # Note: Annoying Mimi thing... ETREE starts in 2015 but Mimi fills historic Co2EFarm with missing values (even though it also starts in 2015). So need to index into 2015.
-    index_2015 = findfirst(x-> x == 2015, collect(start_year:end_year))
-    new_etree = dice_farm[:emissions, :ETREE] .- dice_farm[:emissions, :Co2EFarm][index_2015:end]
+    new_etree = dice_farm[:emissions, :ETREE] .- dice_farm[:emissions, :Co2EFarm]
 
     # Subtract agriculture CH4 emissions from exogenous RCP values to avoid double-counting (need to convert FARM emissions from from kg to Mt)
-    new_rcp_CH₄ = dice_farm[:emissions, :MethERCP] .- (dice_farm[:emissions, :MethEFarm][index_2015:end] / 1e9)
+    new_rcp_CH₄ = dice_farm[:emissions, :MethERCP] .- (dice_farm[:emissions, :MethEFarm] / 1e9)
 
     # Subtract agriculture N2O emissions from exogenous RCP values to avoid double-counting (need to convert FARM emissions from from kg to Mt and from N2O -> N)
-    new_rcp_N₂O = dice_farm[:emissions, :N2oERCP] .- (dice_farm[:emissions, :N2oEFarm][index_2015:end] / 1e9 * (28.01/44.01))
+    new_rcp_N₂O = dice_farm[:emissions, :N2oERCP] .- (dice_farm[:emissions, :N2oEFarm] / 1e9 * (28.01/44.01))
 
     # Update exogenous (non-FARM agriculture) emission sources for land use CO₂, CH₄, and N₂O.
-    set_param!(dice_farm, :emissions, :ETREE, new_etree)
-    set_param!(dice_farm, :emissions, :N2oERCP, new_rcp_N₂O)
-    set_param!(dice_farm, :emissions, :MethERCP, new_rcp_CH₄)
+    update_param!(dice_farm, :ETREE, new_etree)
+    update_param!(dice_farm, :N2oERCP, new_rcp_N₂O)
+    update_param!(dice_farm, :MethERCP, new_rcp_CH₄)
 
     # Return model with updated emission scenarios that fully endogenize the FARM emissions.
     return dice_farm
