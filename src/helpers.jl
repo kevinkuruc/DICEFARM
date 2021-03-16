@@ -100,3 +100,35 @@ function set_intensities(m, intensities)
     set_param!(m, :farm, :sigmaSheepGoatN2o, intensities[6,3])  
 end
 
+
+# Function to make sure lengths align for different length timestep Mimi components.
+function pad_parameters(p::Dict, time_len::Int,  begin_padding::Number, end_padding::Number)
+
+    padded_p = deepcopy(p)
+
+    for key in keys(p)
+        values = p[key]
+        size(values,1) == time_len ? padded_p[key] = pad_parameters(values, time_len, begin_padding, end_padding) :  padded_p[key] = values
+    end
+
+    return padded_p
+end
+
+function pad_parameter(data::Array, time_len::Number, begin_padding::Number, end_padding::Number)
+    size(data, 1) != time_len ? error("time dimension must match rows") : nothing
+
+    new_data = deepcopy(data)
+    if begin_padding != 0
+        begin_padding_rows = Array{Union{Missing, Number}}(missing, begin_padding, size(data, 2)) 
+        new_data = vcat(begin_padding_rows, new_data)
+    end
+
+    if end_padding != 0
+        end_padding_rows = Array{Union{Missing, Number}}(missing, end_padding, size(data, 2)) 
+        new_data = vcat(new_data, end_padding_rows)
+    end
+
+    ndims(data) == 1 ? new_data = new_data[:,1] : nothing 
+
+    return new_data
+end
