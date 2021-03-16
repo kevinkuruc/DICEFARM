@@ -1,4 +1,4 @@
-using MimiFAIR13
+using MimiFAIR
 using Interpolations
 using Mimi
 
@@ -23,7 +23,7 @@ include(joinpath("components", "farm_component.jl"))
 function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS)
 
     # Create an instance of FAIR to couple in DICE-FARM components.
-    m = create_fair(rcp_scenario="RCP60", start_year=start_year, end_year=end_year, TCR=TCR, ECS=ECS)
+    m = MimiFAIR.get_model(rcp_scenario="RCP60", start_year=start_year, end_year=end_year, TCR=TCR, ECS=ECS)
 
     #--------------------------------------------------------------------------------------------------------------------
     # TODO: Hide all of this in a function or data prep step in the future. Just putting here to be clear what's going on.
@@ -95,12 +95,20 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     #set_param!(m, :totalfactorproductivity, :ga0, p[:ga0])
     #set_param!(m, :totalfactorproductivity, :dela,   p[:dela]) 
 
+    # Pad the parameters so they have the time length of the full model, not just DICE
+    p = pad_parameters(p, end_year - start_dice_year + 1, start_dice_year - start_year, 0)
+
+    # ----- Parameters Common to Multiple Components ----- #
+    set_param!(m, :l,       p[:l]) # grosseconomy, neteconomy, and welfare
+    set_param!(m, :MIU,     pad_parameter(annual_MIU, end_year - start_dice_year + 1, start_dice_year - start_year, 0)) # emissions and neteconomy
+
+
     # ----- Gross Economy ----- #
     set_param!(m, :grosseconomy, :l,    p[:l])
     set_param!(m, :grosseconomy, :gama, p[:gama])
     set_param!(m, :grosseconomy, :dk,   0.0819)  #Comes from changing DICE to annual
     set_param!(m, :grosseconomy, :k0,   p[:k0])
-    set_param!(m, :grosseconomy, :AL,   annual_TFP)
+    set_param!(m, :grosseconomy, :AL,   pad_parameter(annual_TFP, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
 
     # ----- Agriculture Emissions ----- #
     set_param!(m, :farm, :Beef,               p[:Beef])
@@ -133,17 +141,17 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     set_param!(m, :emissions, :gsigma1,        p[:gsigma1])
     set_param!(m, :emissions, :dsig,           p[:dsig])
     set_param!(m, :emissions, :e0,             p[:e0])
-    set_param!(m, :emissions, :MIU,            annual_MIU)
+    set_param!(m, :emissions, :MIU,            pad_parameter(annual_MIU, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
     set_param!(m, :emissions, :EIndReduc,      p[:EIndReduc])
     set_param!(m, :emissions, :cca0,           p[:cca0])
     set_param!(m, :emissions, :cumetree0,      p[:cumetree0])
-    set_param!(m, :emissions, :MethERCP,       rcp_fossil_ch4[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
-    set_param!(m, :emissions, :N2oERCP,        rcp_fossil_n2o[rcp_2015_index:end]) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
-    set_param!(m, :emissions, :Co2Pulse,        0)
-    set_param!(m, :emissions, :MethPulse,        0)
-    set_param!(m, :emissions, :N2oPulse,        0)    
+    set_param!(m, :emissions, :MethERCP,       rcp_fossil_ch4) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
+    set_param!(m, :emissions, :N2oERCP,        rcp_fossil_n2o) # Need to subtract endogenous FARM emissions from RCP scenario in second step.
+    set_param!(m, :emissions, :Co2Pulse,       0.0)
+    set_param!(m, :emissions, :MethPulse,      0.0)
+    set_param!(m, :emissions, :N2oPulse,       0.0)
     set_param!(m, :emissions, :DoubleCountCo2, p[:DoubleCountCo2])
-    set_param!(m, :emissions, :ETREE,          annual_ETREE)
+    set_param!(m, :emissions, :ETREE,          pad_parameter(annual_ETREE, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
 
     # ----- Climate Damages ----- #
     set_param!(m, :damages, :a1, p[:a1])
@@ -151,11 +159,11 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     set_param!(m, :damages, :a3, p[:a3])
 
     # ----- Net Economy ----- #
-    set_param!(m, :neteconomy, :MIU,      annual_MIU)
+    set_param!(m, :neteconomy, :MIU,      pad_parameter(annual_MIU, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
     set_param!(m, :neteconomy, :expcost2, p[:expcost2])
     set_param!(m, :neteconomy, :pback,    p[:pback])
     set_param!(m, :neteconomy, :gback,    p[:gback])
-    set_param!(m, :neteconomy, :S,        annual_savings)
+    set_param!(m, :neteconomy, :S,        pad_parameter(annual_savings, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
     set_param!(m, :neteconomy, :l,        p[:l])
     set_param!(m, :neteconomy, :CEQ,      p[:CEQ])
 

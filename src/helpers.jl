@@ -108,7 +108,7 @@ function pad_parameters(p::Dict, time_len::Int,  begin_padding::Number, end_padd
 
     for key in keys(p)
         values = p[key]
-        size(values,1) == time_len ? padded_p[key] = pad_parameters(values, time_len, begin_padding, end_padding) :  padded_p[key] = values
+        size(values,1) == time_len ? padded_p[key] = pad_parameter(values, time_len, begin_padding, end_padding) :  padded_p[key] = values
     end
 
     return padded_p
