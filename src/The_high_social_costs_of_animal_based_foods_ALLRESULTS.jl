@@ -1,4 +1,4 @@
-using CSV, DataFrames, Plots, Roots
+using CSV, DataFrames, Plots, Roots, StatsPlots
 
 directory = dirname(pwd())
 data_directory = joinpath(directory, "data")
@@ -59,12 +59,12 @@ EggsPulse = copy(OrigEggs)
 SheepGoatPulse = copy(OrigSheepGoat)
 
 #USA Average Diets 2013
-BeefPulse[6] = OrigBeef[6] + 1000*(4.5) 				
-DairyPulse[6] = OrigDairy[6] + 1000*(8)
-PoultryPulse[6] = OrigPoultry[6] + 1000*(6.5)
-PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
-EggsPulse[6] = OrigEggs[6]  + 1000*(1.6)
-SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(.06)
+BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.5)
+DairyPulse[TwentyTwenty] = OrigDairy[TwentyTwenty] + 1000*(8)
+PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.5)
+PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
+EggsPulse[TwentyTwenty] = OrigEggs[TwentyTwenty]  + 1000*(1.6)
+SheepGoatPulse[TwentyTwenty] = OrigSheepGoat[TwentyTwenty] + 1000*(.06)
 
 #Model With Vegan Pulse
 VeganPulse = create_dice_farm()
@@ -82,7 +82,7 @@ GasPulse = create_dice_farm()
 T = DICELength
 pulse = 1000*4.6*1e-9
 #From: https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references
-set_param!(GasPulse, :emissions, :Co2Pulse, pulse)
+update_param!(GasPulse, :Co2Pulse, pulse)
 run(GasPulse)
 GasIRF = (GasPulse[:co2_cycle, :T] - BaseTemp)/1000
 HHEnergyPulse = create_dice_farm()
@@ -109,12 +109,12 @@ GlobalPoultryPulse = copy(OrigPoultry)
 GlobalEggsPulse = copy(OrigEggs)
 GlobalSheepGoatPulse = copy(OrigSheepGoat)
 
-GlobalBeefPulse[6] = 0
-GlobalDairyPulse[6] = 0
-GlobalPorkPulse[6] = 0
-GlobalPoultryPulse[6] = 0
-GlobalEggsPulse[6] = 0
-GlobalSheepGoatPulse[6] = 0
+GlobalBeefPulse[TwentyTwenty] = 0
+GlobalDairyPulse[TwentyTwenty] = 0
+GlobalPorkPulse[TwentyTwenty] = 0
+GlobalPoultryPulse[TwentyTwenty] = 0
+GlobalEggsPulse[TwentyTwenty] = 0
+GlobalSheepGoatPulse[TwentyTwenty] = 0
 
 update_param!(GlobalVeganPulse, :Beef, GlobalBeefPulse)
 update_param!(GlobalVeganPulse, :Dairy, GlobalDairyPulse)
@@ -232,7 +232,6 @@ SSA_Socialcosts = VegSocialCosts(SSA_Diets, SSA_Intensities)
 WEU_Socialcosts = VegSocialCosts(WEU_Diets, WEU_Intensities)
 
 # -------- Figure 3B ---------------#
-using StatsPlots
 Region = repeat(["Africa", "East\nAsia", "East\nEurope", "Lat\nAm.", "Mid\nEast", "North\nAm.", "Oceania", "Russia", "South\nAsia", "West\nEurope"], outer=6)
 Product = repeat(["Beef", "Dairy", "Poultry", "Pork", "Eggs", "Sheep/Goat"], inner=10)
 BarData = [SSA_Socialcosts[3:end,2] ESEA_Socialcosts[3:end,2] EEU_Socialcosts[3:end,2] LatAm_Socialcosts[3:end,2] MidEast_Socialcosts[3:end,2] NO_Socialcosts[3:end,2] Oceania_Socialcosts[3:end,2] Russia_Socialcosts[3:end,2] SAS_Socialcosts[3:end,2] WEU_Socialcosts[3:end,2]]'

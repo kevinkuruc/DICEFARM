@@ -14,6 +14,9 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 
 	SocialCosts = zeros(8) # Vegan, Vegetarian; then each of 6 animal products
 
+	# Get index for 2020
+	index_2020 = findfirst(x -> x == 2020, 1765:2500)
+
 	# ----- Need original amount consumed -------- #
 	OrigBeef = DICEFARM[:farm, :Beef]
 	OrigDairy = DICEFARM[:farm, :Dairy]
@@ -30,12 +33,12 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 	EggsPulse = copy(OrigEggs)
 	SheepGoatPulse = copy(OrigSheepGoat)
 
-	BeefPulse[6] = OrigBeef[6] + 1000*(Diets[1]) 				
-	DairyPulse[6] = OrigDairy[6] + 1000*(Diets[2])
-	PoultryPulse[6] = OrigPoultry[6] + 1000*(Diets[3])
-	PorkPulse[6] = OrigPork[6]  + 1000*(Diets[4])
-	EggsPulse[6] = OrigEggs[6]  + 1000*(Diets[5])
-	SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(Diets[6])
+	BeefPulse[index_2020] = OrigBeef[index_2020] + 1000*(Diets[1])
+	DairyPulse[index_2020] = OrigDairy[index_2020] + 1000*(Diets[2])
+	PoultryPulse[index_2020] = OrigPoultry[index_2020] + 1000*(Diets[3])
+	PorkPulse[index_2020] = OrigPork[index_2020]  + 1000*(Diets[4])
+	EggsPulse[index_2020] = OrigEggs[index_2020]  + 1000*(Diets[5])
+	SheepGoatPulse[index_2020] = OrigSheepGoat[index_2020] + 1000*(Diets[6])
 
 	VeganPulse = create_dice_farm()
 	update_intensities(VeganPulse, Intensities)
@@ -57,10 +60,10 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 	PoultryPulse = copy(OrigPoultry)
 	SheepGoatPulse = copy(OrigSheepGoat)
 
-	BeefPulse[6] = OrigBeef[6] + 1000*(Diets[1]) 
-	PoultryPulse[6] = OrigPoultry[6] + 1000*(Diets[3])			
-	PorkPulse[6] = OrigPork[6]  + 1000*(Diets[4])
-	SheepGoatPulse[6] = OrigSheepGoat[6] + 1000*(Diets[6])
+	BeefPulse[index_2020] = OrigBeef[index_2020] + 1000*(Diets[1]) 
+	PoultryPulse[index_2020] = OrigPoultry[index_2020] + 1000*(Diets[3])			
+	PorkPulse[index_2020] = OrigPork[index_2020]  + 1000*(Diets[4])
+	SheepGoatPulse[index_2020] = OrigSheepGoat[index_2020] + 1000*(Diets[6])
 
 	VegetarianPulse = create_dice_farm()
 	update_intensities(VegetarianPulse, Intensities)
@@ -84,7 +87,7 @@ function VegSocialCosts(Diets, Intensities, discount=.015)
 		update_intensities(tempModel, Intensities)
 		update_param!(tempModel, :rho, discount)
 		Pulse = copy(O)
-		Pulse[6] = Pulse[6] + 20000.0 #add 20,000 kg of protein (or 20,000,000 g---then 1000 deflated for C; 1000 more deflated 4 lines down) 
+		Pulse[index_2020] = Pulse[index_2020] + 20000.0 #add 20,000 kg of protein (or 20,000,000 g---then 1000 deflated for C; 1000 more deflated 4 lines down) 
 		update_param!(tempModel, meat, Pulse)
 		run(tempModel)
 		W = tempModel[:welfare, :UTILITY]
