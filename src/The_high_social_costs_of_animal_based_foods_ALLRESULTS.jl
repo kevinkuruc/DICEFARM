@@ -31,19 +31,19 @@ OrigEggs = DICEFARM[:farm, :Eggs]
 OrigSheepGoat = DICEFARM[:farm, :SheepGoat]
 
 VeganDICE = create_dice_farm()
-update_param!(VeganDICE, :Beef, [OrigBeef[1:5]; zeros(DICELength-5)])  			#Keep 2015-2019 consumption
-update_param!(VeganDICE, :Dairy, [OrigDairy[1:5]; zeros(DICELength-5)])
-update_param!(VeganDICE, :Poultry, [OrigPoultry[1:5]; zeros(DICELength-5)])
-update_param!(VeganDICE, :Pork, [OrigPork[1:5]; zeros(DICELength-5)])
-update_param!(VeganDICE, :Eggs, [OrigEggs[1:5]; zeros(DICELength-5)])
-update_param!(VeganDICE, :SheepGoat, [OrigSheepGoat[1:5]; zeros(DICELength-5)])
+update_param!(VeganDICE, :Beef, [OrigBeef[1:TwentyTwenty-1]; zeros(length(2020:2500))])  			#Keep 2015-2019 consumption
+update_param!(VeganDICE, :Dairy, [OrigDairy[1:TwentyTwenty-1]; zeros(length(2020:2500))])
+update_param!(VeganDICE, :Poultry, [OrigPoultry[1:TwentyTwenty-1]; zeros(length(2020:2500))])
+update_param!(VeganDICE, :Pork, [OrigPork[1:TwentyTwenty-1]; zeros(length(2020:2500))])
+update_param!(VeganDICE, :Eggs, [OrigEggs[1:TwentyTwenty-1]; zeros(length(2020:2500))])
+update_param!(VeganDICE, :SheepGoat, [OrigSheepGoat[1:TwentyTwenty-1]; zeros(length(2020:2500))])
 run(VeganDICE)
 VeganTemp = VeganDICE[:co2_cycle, :T]
 plotT = 2120
-t = collect(2020:1:plotT)
+t = collect(2019:1:plotT)
 TempDiff = BaseTemp[TwentyTwenty + length(t)] - VeganTemp[TwentyTwenty+length(t)]
 println("Temp Diff is $TempDiff")
-TotalPlot = plot(t, [BaseTemp[TwentyTwenty:TwentyTwenty+length(t)-1] VeganTemp[TwentyTwenty:TwentyTwenty+length(t)-1]], linewidth=2, 
+TotalPlot = plot(t, [BaseTemp[TwentyTwenty-1:TwentyTwenty+length(t)-2] VeganTemp[TwentyTwenty-1:TwentyTwenty+length(t)-2]], linewidth=2, 
 	linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash], grid=false,
 	 ylabel="Temperature Increase (C Above Pre-Industrial)")
 savefig(joinpath(output_directory, "Fig1A.pdf"))
