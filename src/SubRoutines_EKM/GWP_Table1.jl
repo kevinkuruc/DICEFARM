@@ -1,3 +1,6 @@
+# Add a check for which SCC to use (EPA IAWG SCC :EPA or Nordhaus PNAS estimate :Nordhaus)
+# TODO = Are they both expressed in same units (Year X US dollars?)
+scc_version = :Nordhaus
 
 # 20, 100, and 500 year GWPs
 # From Table 2.14 (https://www.ipcc.ch/site/assets/uploads/2018/02/ar4-wg1-chapter2-1.pdf)
@@ -52,9 +55,16 @@ pork_global 	= 1e6*7852.9*2.0
 eggs_global		= 1e6*7852.9*1.25
 sheepgoat_global= 1e6*7852.9*0.4
 
+# Nordhaus SCC from PNAS - Revisiting the Social Cost of Carbon
 # EPA SCC for DICE (averaged over 5 scenarios) in 2020 under 3% discount rate
 # See Table A3: https://19january2017snapshot.epa.gov/sites/production/files/2016-12/documents/sc_co2_tsd_august_2016.pdf
-epa_scc = 37.8
+if scc_version == :EPA
+	scc = 37.8
+elseif scc_version == :Nordhaus
+	scc = 31.0
+else
+	println("You picked an incorrect SCC version.")
+end
 
 # ------------------------------
 # 20 Year GWP
