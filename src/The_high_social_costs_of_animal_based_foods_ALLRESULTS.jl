@@ -46,8 +46,9 @@ println("Temp Diff is $TempDiff")
 TotalPlot = plot(t, [BaseTemp[TwentyTwenty-1:TwentyTwenty+length(t)-2] VeganTemp[TwentyTwenty-1:TwentyTwenty+length(t)-2]], linewidth=2, 
 	linecolor=[:black :green], label=["BAU" "Vegan"], legend=:topleft, linestyle=[:solid :dash], grid=false,
 	 ylabel="Temperature Increase (C Above Pre-Industrial)")
-savefig(joinpath(output_directory, "Fig1A.pdf"))
-savefig(joinpath(output_directory, "Fig1A.svg"))
+#savefig(joinpath(output_directory, "Fig1A.pdf"))
+#savefig(joinpath(output_directory, "Fig1A.svg"))
+#savefig(joinpath(output_directory, "Fig1A.tiff"))
 
 # ------ Plot Vegan Pulse vs Gas Pulse: Figure 1B ------- #
 
@@ -96,8 +97,9 @@ HHEnergyIRF = (HHEnergyPulse[:co2_cycle, :T] - BaseTemp)/1000
 PulsePlot = plot([2019;t], 1e12*[VeganIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] GasIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1] HHEnergyIRF[TwentyTwenty-1:TwentyTwenty+length(t)-1]], legend=:topright,
  label=["Diet" "Passenger Vehicle" "Household Energy (Per Cap.)"], linewidth=2, linestyle=[:solid :dash :dashdot], color=[:green :black :orange],
   ylabel="Temperature Change (1e-15 C)", ylims=(0,2.75), grid=false)
-savefig(joinpath(output_directory, "Fig1B.pdf"))
-savefig(joinpath(output_directory, "Fig1B.svg"))
+#savefig(joinpath(output_directory, "Fig1B.pdf"))
+#savefig(joinpath(output_directory, "Fig1B.svg"))
+
 
 # -------- Total Social Costs --------------- #
 GlobalVeganPulse = create_dice_farm()
@@ -181,7 +183,7 @@ Table1[2,2:end] = BaselineSCs_Stern[:,2]
 Table1[3:end, 2:end] = EPAEsts
 Table1[:,3] = Table1[:,2]-Table1[:,3]
 Table1_df = DataFrame(Run = ["Base"; "Stern"; "2.5%"; "3%"; "5%"], Global = Table1[:,1], SAD = Table1[:,2], Vegetarian=Table1[:,3], Beef=Table1[:,4], Dairy=Table1[:,5], Poultry=Table1[:,6], Pork=Table1[:,7], Eggs=Table1[:,8], SheepGoat=Table1[:,9])
-CSV.write(joinpath(output_directory, "Table1.csv"), Table1_df)
+#CSV.write(joinpath(output_directory, "Table1_new.csv"), Table1_df)
 
 #-------- Table S1: Split Table 1 Base case by product -- #
 TableS1 = DataFrame()
@@ -194,7 +196,7 @@ TableS1[!,:SheepGoat] = [50*Diets[6]*Table1[1,9]]
 #CSV.write(joinpath(output_directory, "TableS1.csv"), TableS1)
 
 #-------- Figure 2 -------------------------------------- #
-Isoquants()
+#Isoquants()
 
 #--------- Loop Social Costs Over Region ---------------- #
 ESEA_Intensities    = [49.9 6.51 .27    ; 19.9 1.60 .07     ; 35.7 .02 .05	; 26.7 .60 .05 ; 26.9 .04 .04  	; 30.0 3.20 .13]
@@ -237,12 +239,12 @@ Product = repeat(["Beef", "Dairy", "Poultry", "Pork", "Eggs", "Sheep/Goat"], inn
 BarData = [SSA_Socialcosts[3:end,2] ESEA_Socialcosts[3:end,2] EEU_Socialcosts[3:end,2] LatAm_Socialcosts[3:end,2] MidEast_Socialcosts[3:end,2] NO_Socialcosts[3:end,2] Oceania_Socialcosts[3:end,2] Russia_Socialcosts[3:end,2] SAS_Socialcosts[3:end,2] WEU_Socialcosts[3:end,2]]'
 groupedbar(Region, BarData, group=Product, grid=false, color=[:black :blue :yellow :pink :red :brown],
 foreground_color_legend = nothing, background_color_legend=nothing, legend=(0.9,0.9), legendfontsize=6, ylabel="Cost per 20 g protein serving (\$)")
-savefig(joinpath(output_directory, "Fig3B.pdf"))
-savefig(joinpath(output_directory, "Fig3B.svg"))
+#savefig(joinpath(output_directory, "Fig3B.pdf"))
+#savefig(joinpath(output_directory, "Fig3B.svg"))
 
 #------- Figure 3A -----------------#
-df = DietaryCostsByCountry()
-CSV.write(joinpath(output_directory, "CostsByCountry.csv"), df)
+#df = DietaryCostsByCountry()
+#CSV.write(joinpath(output_directory, "CostsByCountry.csv"), df)
 
 
 #---- Appendix Figures: Increased PC Meat Cons ----- #
