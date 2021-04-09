@@ -108,7 +108,11 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     set_param!(m, :grosseconomy, :gama, p[:gama])
     set_param!(m, :grosseconomy, :dk,   0.0819)  #Comes from changing DICE to annual
     set_param!(m, :grosseconomy, :k0,   p[:k0])
-    set_param!(m, :grosseconomy, :AL,   pad_parameter(annual_TFP, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
+    set_param!(m, :grosseconomy, :a0,   p[:a0])
+    set_param!(m, :grosseconomy, :ga0,  p[:ga0])
+    set_param!(m, :grosseconomy, :dela, p[:dela])
+    set_param!(m, :grosseconomy, :dam_gama, 0.)
+    #set_param!(m, :grosseconomy, :AL,   pad_parameter(annual_TFP, end_year - start_dice_year + 1, start_dice_year - start_year, 0))
 
     # ----- Agriculture Emissions ----- #
     set_param!(m, :farm, :Beef,               p[:Beef])
@@ -178,6 +182,7 @@ function initialize_dice_farm(p, start_year, end_year, start_dice_year, TCR, ECS
     # Create Internal Component Connections
     #-----------------------------------------------------------------------
     connect_param!(m, :grosseconomy, :I,  :neteconomy, :I)
+    connect_param!(m, :grosseconomy, :T, :temperature, :T)
     #connect_param!(m, :grosseconomy, :AL, :totalfactorproductivity, :AL)
 
     connect_param!(m, :emissions, :YGROSS,    :grosseconomy, :YGROSS)

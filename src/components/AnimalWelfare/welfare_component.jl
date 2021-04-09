@@ -32,6 +32,7 @@
         UChicken = ((1e-3*p.ChickenEquiv*365)^(1 - p.elasmu) -1)/(1-p.elasmu) #1 dollar per day, absent meat utility
 
         # Define human utility
+        if gettime(t)>=2015
         if p.elasmu != 1.
         v.PERIODU[t] = (p.CPC[t] ^ (1 - p.elasmu) - 1) / (1 - p.elasmu)
         else
@@ -39,7 +40,7 @@
         end
 
         #Define function for rr
-        if is_first(t) 
+        if gettime(t)==2015 
         v.rr[t] = 1.
         else
         v.rr[t] = v.rr[t-1]*(1-p.rho)
@@ -50,12 +51,17 @@
         v.CEMUTOTPER[t] = v.rr[t]*(v.PERIODU[t] * p.l[t] + p.thetaB*p.Cows[t]*1e-6*(UCow - CL) + p.thetaP*p.Pigs[t]*1e-6*(UPig - CL) + p.thetaC*p.Chickens[t]*1e-6*(UChicken - CL)) 
 
         # Define function for CUMCEMUTOTPER
-        v.CUMCEMUTOTPER[t] = v.CEMUTOTPER[t] + (!is_first(t) ? v.CUMCEMUTOTPER[t-1] : 0)
+        if gettime(t) ==2015
+        v.CUMCEMUTOTPER[t] = v.CEMUTOTPER[t]
+        else
+        v.CUMCEMUTOTPER[t] = v.CEMUTOTPER[t] + v.CUMCEMUTOTPER[t-1] 
+        end
 
         # Define function for UTILITY ---- what happens in last period?
         if is_last(t) 
             v.UTILITY =  p.scale1 * v.CUMCEMUTOTPER[t] + p.scale2
             utility = p.scale1 * v.CUMCEMUTOTPER[t] + p.scale2
+        end
         end
     end
 end

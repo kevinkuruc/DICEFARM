@@ -14,9 +14,9 @@
     Co2EBeef   = Variable(index=[time])    #Co2 emitted from Beef (kg)
     N2oEBeef   = Variable(index=[time])    #N2O emitted from Beef (kg)
 
-    #MethEDairy  = Variable(index=[time])    #Methane emitted Beef (kg)
-    #Co2EDairy   = Variable(index=[time])    #Co2 emitted from Beef (kg)
-    #N2oEDairy   = Variable(index=[time])    #N2O emitted from Beef (kg)
+    MethEDairy  = Variable(index=[time])    #Methane emitted Beef (kg)
+    Co2EDairy   = Variable(index=[time])    #Co2 emitted from Beef (kg)
+    N2oEDairy   = Variable(index=[time])    #N2O emitted from Beef (kg)
 
     MethEPoultry  = Variable(index=[time])    #Methane emitted Beef (kg)
     Co2EPoultry   = Variable(index=[time])    #Co2 emitted from Beef (kg)
@@ -26,13 +26,13 @@
     Co2EPork   = Variable(index=[time])    #Co2 emitted from Beef (kg)
     N2oEPork   = Variable(index=[time])    #N2O emitted from Beef (kg)
 
-    #MethEEggs  = Variable(index=[time])    #Methane emitted Beef (kg)
-    #Co2EEggs   = Variable(index=[time])    #Co2 emitted from Beef (kg)
-    #N2oEEggs   = Variable(index=[time])    #N2O emitted from Beef (kg)
+    MethEEggs  = Variable(index=[time])    #Methane emitted Beef (kg)
+    Co2EEggs   = Variable(index=[time])    #Co2 emitted from Beef (kg)
+    N2oEEggs   = Variable(index=[time])    #N2O emitted from Beef (kg)
 
-    #MethESheepGoat  = Variable(index=[time])    #Methane emitted Beef (kg)
-    #Co2ESheepGoat   = Variable(index=[time])    #Co2 emitted from Beef (kg)
-    #N2oESheepGoat   = Variable(index=[time])    #N2O emitted from Beef (kg)
+    MethESheepGoat  = Variable(index=[time])    #Methane emitted Beef (kg)
+    Co2ESheepGoat   = Variable(index=[time])    #Co2 emitted from Beef (kg)
+    N2oESheepGoat   = Variable(index=[time])    #N2O emitted from Beef (kg)
 
     # --------- Inputs (TFP; Number of Kg of each Animal consumed; Emissions Intensities --------- #
 
@@ -77,14 +77,27 @@
  
     function run_timestep(p, v, d, t)
 	
-    if gettime(t) >= 2020 #Allows planner to solve for optimal veg frac
+    if gettime(t) >= 2020 #Allows planner to solve for optimal vegetarian frac
         Beef = (1-p.MeatReduc)*p.Beef[t]
         Pork = (1-p.MeatReduc)*p.Pork[t]
         Poultry = (1-p.MeatReduc)*p.Poultry[t]
-    else
+        Dairy = p.Dairy[t]
+        Eggs = p.Eggs[t]
+        SheepGoat = p.SheepGoat[t]
+    elseif gettime(t) >=2015
         Beef = p.Beef[t]
         Pork = p.Pork[t]
         Poultry = p.Poultry[t]
+        Dairy = p.Dairy[t]
+        Eggs = p.Eggs[t]
+        SheepGoat = p.SheepGoat[t]
+    else
+        Beef = 0.
+        Pork = 0.
+        Poultry = 0.
+        Dairy =0.
+        Eggs =0.
+        SheepGoat = 0.
     end
 
     v.Cows[t]       = p.ABeef*Beef
@@ -95,9 +108,9 @@
     v.Co2EBeef[t]  = p.sigmaBeefCo2*Beef   # kg
     v.N2oEBeef[t]  = p.sigmaBeefN2o*Beef  # kg 
 
-    #v.MethEDairy[t] = p.sigmaDairyMeth*Dairy  # kg
-    #v.Co2EDairy[t]  = p.sigmaDairyCo2*Dairy   # kg
-    #v.N2oEDairy[t]  = p.sigmaDairyN2o*Dairy  # kg 
+    v.MethEDairy[t] = p.sigmaDairyMeth*Dairy  # kg
+    v.Co2EDairy[t]  = p.sigmaDairyCo2*Dairy   # kg
+    v.N2oEDairy[t]  = p.sigmaDairyN2o*Dairy  # kg 
 
     v.MethEPoultry[t] = p.sigmaPoultryMeth*Poultry  # kg
     v.Co2EPoultry[t]  = p.sigmaPoultryCo2*Poultry   # kg
@@ -107,16 +120,16 @@
     v.Co2EPork[t]  = p.sigmaPorkCo2*Pork   # kg
     v.N2oEPork[t]  = p.sigmaPorkN2o*Pork  # kg 
 
-    #v.MethEEggs[t] = p.sigmaEggsMeth*Eggs  # kg
-    #v.Co2EEggs[t]  = p.sigmaEggsCo2*Eggs   # kg
-    #v.N2oEEggs[t]  = p.sigmaEggsN2o*Eggs  # kg
+    v.MethEEggs[t] = p.sigmaEggsMeth*Eggs  # kg
+    v.Co2EEggs[t]  = p.sigmaEggsCo2*Eggs   # kg
+    v.N2oEEggs[t]  = p.sigmaEggsN2o*Eggs  # kg
 
-    #v.MethESheepGoat[t] = p.sigmaSheepGoatMeth*SheepGoat  # kg
-    #v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2*SheepGoat   # kg
-    #v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o*SheepGoat  # kg
+    v.MethESheepGoat[t] = p.sigmaSheepGoatMeth*SheepGoat  # kg
+    v.Co2ESheepGoat[t]  = p.sigmaSheepGoatCo2*SheepGoat   # kg
+    v.N2oESheepGoat[t]  = p.sigmaSheepGoatN2o*SheepGoat  # kg
 
-    v.MethEFarm[t]  = (v.MethEBeef[t] + v.MethEPoultry[t] + v.MethEPork[t])       #kg
-    v.Co2EFarm[t]   = ((v.Co2EBeef[t] + v.Co2EPoultry[t] + v.Co2EPork[t])/1e12)    #GtC02
-    v.N2oEFarm[t]   = (v.N2oEBeef[t] + v.N2oEPoultry[t] + v.N2oEPork[t])        #kg
+    v.MethEFarm[t]      = (v.MethEBeef[t] + v.MethEDairy[t] + v.MethEPoultry[t] + v.MethEPork[t] + v.MethEEggs[t] + v.MethESheepGoat[t])      #kg
+    v.Co2EFarm[t]       = ((v.Co2EBeef[t] + v.Co2EDairy[t] + v.Co2EPoultry[t] + v.Co2EPork[t] + v.Co2EEggs[t] + v.Co2ESheepGoat[t])/1e12)    #GtC02
+    v.N2oEFarm[t]       = (v.N2oEBeef[t] + v.N2oEDairy[t] + v.N2oEPoultry[t] + v.N2oEPork[t] + v.N2oEEggs[t] + v.N2oESheepGoat[t])       #kg
     end
 end

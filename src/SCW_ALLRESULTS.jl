@@ -11,7 +11,7 @@ run(DICEFARM)
 println("Ran once")
 BaseWelfare = DICEFARM[:welfare, :UTILITY]
 MargCons 	= create_AnimalWelfare()
-set_param!(MargCons, :neteconomy, :CEQ, 1e-9)  #dropping C by 1000 globally
+update_param!(MargCons, :CEQ, 1e-9)  #dropping C by 1000 globally
 run(MargCons)
 MargConsWelfare = MargCons[:welfare, :UTILITY]
 SCNumeraire 	= BaseWelfare - MargConsWelfare
@@ -28,27 +28,28 @@ BeefPulse = copy(OrigBeef)
 PorkPulse = copy(OrigPork)
 PoultryPulse = copy(OrigPoultry)
 
-BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				
-PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
-PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
+BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				
+PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
+PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
 
 VegPulse = create_AnimalWelfare()
-set_param!(VegPulse, :farm, :Beef, BeefPulse)
-set_param!(VegPulse, :farm, :Poultry, PoultryPulse)
-set_param!(VegPulse, :farm, :Pork, PorkPulse)
+update_param!(VegPulse, :Beef, BeefPulse)
+update_param!(VegPulse, :Poultry, PoultryPulse)
+update_param!(VegPulse, :Pork, PorkPulse)
 
 run(VegPulse)
 VegWelfare = VegPulse[:welfare, :UTILITY]
 SCCVeg     = (BaseWelfare - VegWelfare)/(SCNumeraire)
+
 
 # ------- Loop Over Values of Cons Equiv ------------------------- #
 SufferingEquiv = collect(.9:.1:2.8)
 BenefitOfVegetarian = zeros(length(SufferingEquiv))
 for (i,S) in enumerate(SufferingEquiv)
 	tempM = create_AnimalWelfare()
-	set_param!(tempM, :welfare, :CowEquiv, S)
-	set_param!(tempM, :welfare, :ChickenEquiv, S)
-	set_param!(tempM, :welfare, :PigEquiv, S)
+	update_param!(tempM, :CowEquiv, S)
+	update_param!(tempM, :ChickenEquiv, S)
+	update_param!(tempM, :PigEquiv, S)
 	run(tempM)
 	
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
@@ -56,17 +57,17 @@ for (i,S) in enumerate(SufferingEquiv)
 	PorkPulse = copy(OrigPork)
 	PoultryPulse = copy(OrigPoultry)
 
-	BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-	PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
-	PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
+	BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
+	PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
+	PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
-	set_param!(VegPulse, :welfare, :CowEquiv, S)
-	set_param!(VegPulse, :welfare, :ChickenEquiv, S)
-	set_param!(VegPulse, :welfare, :PigEquiv, S)
-	set_param!(VegPulse, :farm, :Beef, BeefPulse)
-	set_param!(VegPulse, :farm, :Poultry, PoultryPulse)
-	set_param!(VegPulse, :farm, :Pork, PorkPulse)
+	update_param!(VegPulse, :CowEquiv, S)
+	update_param!(VegPulse, :ChickenEquiv, S)
+	update_param!(VegPulse, :PigEquiv, S)
+	update_param!(VegPulse, :Beef, BeefPulse)
+	update_param!(VegPulse, :Poultry, PoultryPulse)
+	update_param!(VegPulse, :Pork, PorkPulse)
 	run(VegPulse)
 	VegWelfare = VegPulse[:welfare, :UTILITY]
 	BenefitOfVegetarian[i] = (TempBaseWelfare - VegWelfare)/SCNumeraire
@@ -87,7 +88,7 @@ etas = collect(1.05:.05:1.85)
 BenefitOfVegetarianEta = zeros(length(etas))
 for (i,eta) in enumerate(etas)
 	tempM = create_AnimalWelfare()
-	set_param!(tempM, :welfare, :elasmu, eta)
+	update_param!(tempM, :elasmu, eta)
 	run(tempM)
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
 	BeefPulse = copy(OrigBeef)
@@ -95,20 +96,20 @@ for (i,eta) in enumerate(etas)
 	PoultryPulse = copy(OrigPoultry)
 
 	MargCons = create_AnimalWelfare()
-	set_param!(MargCons, :welfare, :elasmu, eta)
-	set_param!(MargCons, :neteconomy, :CEQ, 1e-9)
+	update_param!(MargCons, :elasmu, eta)
+	update_param!(MargCons, :CEQ, 1e-9)
 	run(MargCons)
 	tempSCNumeraire = TempBaseWelfare - MargCons[:welfare, :UTILITY]
 
-	BeefPulse[6] = OrigBeef[6] + 1000*(4.8) 				
-	PorkPulse[6] = OrigPork[6]  + 1000*(2.7)
-	PoultryPulse[6] = OrigPoultry[6] + 1000*(6.7)
+	BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				
+	PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
+	PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
-	set_param!(VegPulse, :welfare, :elasmu, eta)
-	set_param!(VegPulse, :farm, :Beef, BeefPulse)
-	set_param!(VegPulse, :farm, :Poultry, PoultryPulse)
-	set_param!(VegPulse, :farm, :Pork, PorkPulse)
+	update_param!(VegPulse, :elasmu, eta)
+	update_param!(VegPulse, :Beef, BeefPulse)
+	update_param!(VegPulse, :Poultry, PoultryPulse)
+	update_param!(VegPulse, :Pork, PorkPulse)
 	run(VegPulse)
 	VegWelfare = VegPulse[:welfare, :UTILITY]
 	BenefitOfVegetarianEta[i] = (TempBaseWelfare - VegWelfare)/tempSCNumeraire
@@ -125,20 +126,20 @@ i = collect(1:1:length(Meats))
 for (meat, O, i) in zip(Meats, Origs, i)
 	for (j, S) in enumerate(SufferingEquiv)	
 	tempM = create_AnimalWelfare()
-	set_param!(tempM, :welfare, :CowEquiv, S)
-	set_param!(tempM, :welfare, :ChickenEquiv, S)
-	set_param!(tempM, :welfare, :PigEquiv, S)
+	update_param!(tempM, :CowEquiv, S)
+	update_param!(tempM, :ChickenEquiv, S)
+	update_param!(tempM, :PigEquiv, S)
 	run(tempM)
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
 
 	MPulse = copy(O)
-	MPulse[6] = MPulse[6] + 1000*.02 				
+	MPulse[TwentyTwenty] = MPulse[TwentyTwenty] + 1000*.02 				
 
 	M = create_AnimalWelfare()
-	set_param!(M, :welfare, :CowEquiv, S)
-	set_param!(M, :welfare, :ChickenEquiv, S)
-	set_param!(M, :welfare, :PigEquiv, S)
-	set_param!(M, :farm, meat, MPulse)
+	update_param!(M, :CowEquiv, S)
+	update_param!(M, :ChickenEquiv, S)
+	update_param!(M, :PigEquiv, S)
+	update_param!(M, meat, MPulse)
 	run(M)
 	MWelfare = M[:welfare, :UTILITY]
 	SCs[j, i] = (TempBaseWelfare - MWelfare)/SCNumeraire

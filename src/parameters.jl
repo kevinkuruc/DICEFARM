@@ -16,8 +16,8 @@ function getdice2016excelparameters(start_year, end_year, DICEFile)
     p[:cca0]        = getparams(f, "B92:B92", :single, "Base", 1)       #Initial cumulative industrial emissions
     p[:cumetree0]   = 100							         			#Initial cumulative emissions from deforestation (see GAMS code)
     p[:damadj]      = getparams(f, "B65:B65", :single, "Parameters", 1) #Adjustment exponent in damage function
-	p[:dela]		= getparams(f, "B110:B110", :single, "Parameters",1)#Decline rate of TFP per 5 years
-	p[:tfp]         = getparams(f, "B21:CW21", :all, "Base", T)       # Total factor productivity.
+	p[:dela]		= -0.005064183775413589                             #Decline rate of TFP growth
+	p[:tfp]         = getparams(f, "B21:CW21", :all, "Base", T)         # Total factor productivity.
     p[:deland]		= getparams(f, "D64:D64", :single, "Parameters", 1) #Decline rate of land emissions (per period)
     p[:DoubleCountCo2] = zeros(T)                                       #Just here for calibration purposes
     p[:dk]          = getparams(f, "B6:B6", :single, "Base", 1)         #Depreciation rate on capital (per year)
@@ -29,7 +29,7 @@ function getdice2016excelparameters(start_year, end_year, DICEFile)
     p[:eqmat]       = getparams(f, "B82:B82", :single, "Parameters", 1) #Equilibirum concentration of CO2 in atmosphere (GTC)
     p[:expcost2]    = getparams(f, "B39:B39", :single, "Base", 1)       #Exponent of control cost function
     p[:fosslim]     = getparams(f, "B57:B57", :single, "Base", 1)       #Maximum carbon resources (Gtc)
-	p[:ga0]			= getparams(f, "B109:B109", :single, "Parameters",1)#Initial growth rate for TFP per 5 years
+	p[:ga0]			= 0.01576779620896957                               #Initial growth rate for TFP
     p[:gama]        = getparams(f, "B5:B5", :single, "Base", 1)         #Capital Share
 	p[:gback]		= getparams(f, "B26:B26", :single, "Parameters", 1) #Initial cost decline backstop cost per period
 	p[:gsigma1]		= getparams(f, "B15:B15", :single, "Parameters", 1)	#Initial growth of sigma (per year)

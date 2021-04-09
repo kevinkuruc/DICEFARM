@@ -27,7 +27,8 @@
 
     function run_timestep(p, v, d, t)
 		#Define function for PBACKTIME
-        if is_first(t)
+        if gettime(t) >=2015
+        if gettime(t) ==2015
             v.PBACKTIME[t] = p.pback
         else
             newgback = (1+p.gback)^.2 - 1			#convert to annualized growth
@@ -65,5 +66,6 @@
     
         #Define function for CPRICE (equation from GAMS version of DICE2016)
         v.CPRICE[t] = v.PBACKTIME[t] * (p.MIU[t]^(p.expcost2 - 1))
+        end
     end
 end
