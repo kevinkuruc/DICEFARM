@@ -182,6 +182,52 @@ plot(x, y, legend=false, lw=1.1, ylabel="Utility (Less Critical Level)", xlabel=
 hline!([0], linestyle=:dash, linecolor=:black)
 savefig(joinpath(output_directory, "UtilityPlot.pdf"))
 
+# ---------- Cows vs Chickens Plot ------- #
+Thetas = collect(0.1:.4:.9)
+SCCs   = zeros(length(Thetas))
+Beef_serving_Pulse = copy(OrigBeef)
+Beef_serving_Pulse[TwentyTwenty] = 100000*.02
+Poultry_serving_Pulse = copy(OrigPoultry)
+Poultry_serving_Pulse[TwentyTwenty] = 100000*.02
+for (i, theta) in enumerate(Thetas)
+	rho = .015
+	a1  = .0023600
+	marg_welfare_diff = 0.
+	while marg_welfare_diff<1.
+		rho = 0.95*rho
+		a1  = 1.05*a1
+		m1  = create_AnimalWelfare()
+		m2  = create_AnimalWelfare()
+		update_param!(m1, :rho, rho)
+		update_param!(m1, :a1, a1)
+		update_param!(m1, :Beef, Beef_serving_Pulse)
+		update_param!(m2, :rho, rho)
+		update_param!(m2, :a1, a1)
+		update_param!(m2, :Beef, Poultry_serving_Pulse)
+		run(m1)
+		run(m2)
+		marg_welfare_diff = m2[:welfare, :UTILITY]/m1[:welfare, :UTILITY]		
+	end
+	#Compute implied SCC for this combination
+	base_welfare_for_scc = create_AnimalWelfare()
+	update_param!(base_welfare_for_scc, :rho, rho)
+	update_param!(base_welfare_for_scc, :a1, a1)
+	run(base_welfare_for_scc)
+	marg_cons_for_scc   = create_AnimalWelfare()
+	update_param!(marg_cons_for_scc, :rho, rho)
+	update_param!(marg_cons_for_scc, :a1, a1)
+	update_param!(marg_cons_for_scc, :CEQ, 1e-9)
+	run(marg_cons_for_scc)
+	Co2_pulse_for_scc   = create_AnimalWelfare()
+	update_param!(marg_cons_for_scc, :rho, rho)
+	update_param!(marg_cons_for_scc, :a1, a1)
+	update_param!(marg_cons_for_scc, :Co2Pulse, 1.)
+	SCCs[i] = 1e-6*(base_welfare_for_scc[:welfare, :UTILITY] - Co2_pulse_for_scc[:welfare, :UTILITY])/(base_welfare_for_scc[:welfare, :UTILITY] - marg_cons_for_scc[:welfare, :UTILITY])
+end
+plot(SCCs, Thetas, label="Indifference Line")
+
+
+
 
 # --------- Optimal Policy ---------- # 
 m = create_AnimalWelfareOpt()
