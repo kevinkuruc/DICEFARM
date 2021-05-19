@@ -11,7 +11,7 @@ run(DICEFARM)
 println("Ran once")
 BaseWelfare = DICEFARM[:welfare, :UTILITY]
 MargCons 	= create_AnimalWelfare()
-update_param!(MargCons, :CEQ, 1e-9)  #dropping C by 1000 globally
+update_param!(MargCons, :CEQ, 1e-6)  #dropping C by $1 Million globally
 run(MargCons)
 MargConsWelfare = MargCons[:welfare, :UTILITY]
 SCNumeraire 	= BaseWelfare - MargConsWelfare
@@ -28,9 +28,9 @@ BeefPulse = copy(OrigBeef)
 PorkPulse = copy(OrigPork)
 PoultryPulse = copy(OrigPoultry)
 
-BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				
-PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
-PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
+BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1e6*(4.5) 	 #Add 1 Million Beef Eaters			
+PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1e6*(2.7)
+PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1e6*(6.5)
 
 VegPulse = create_AnimalWelfare()
 update_param!(VegPulse, :Beef, BeefPulse)
@@ -53,13 +53,6 @@ for (i,S) in enumerate(SufferingEquiv)
 	run(tempM)
 	
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
-	BeefPulse = copy(OrigBeef)
-	PorkPulse = copy(OrigPork)
-	PoultryPulse = copy(OrigPoultry)
-
-	BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				#Add pulse to year 2020; pump up for Veg diets
-	PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
-	PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
 	update_param!(VegPulse, :CowEquiv, S)
@@ -70,7 +63,7 @@ for (i,S) in enumerate(SufferingEquiv)
 	update_param!(VegPulse, :Pork, PorkPulse)
 	run(VegPulse)
 	VegWelfare = VegPulse[:welfare, :UTILITY]
-	BenefitOfVegetarian[i] = (TempBaseWelfare - VegWelfare)/SCNumeraire
+	BenefitOfVegetarian[i] = (TempBaseWelfare - VegWelfare)/SCNumeraire  #Numeraire unaffected by animal utilities (its Marg Utility of Human Consumption)
 end
 Basecost = BenefitOfVegetarian[2]
 
@@ -84,26 +77,19 @@ CSV.write(joinpath(output_directory, "BySuffering.csv"), sufferingdf)
 
 # --------- Loop over values of eta ----------------- #
 # Note, need to reset SCNumeraire since this depends on eta
-etas = collect(1.05:.05:1.85)
+etas = collect(1.05:.1:1.85)
 BenefitOfVegetarianEta = zeros(length(etas))
 for (i,eta) in enumerate(etas)
 	tempM = create_AnimalWelfare()
 	update_param!(tempM, :elasmu, eta)
 	run(tempM)
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
-	BeefPulse = copy(OrigBeef)
-	PorkPulse = copy(OrigPork)
-	PoultryPulse = copy(OrigPoultry)
 
 	MargCons = create_AnimalWelfare()
 	update_param!(MargCons, :elasmu, eta)
-	update_param!(MargCons, :CEQ, 1e-9)
+	update_param!(MargCons, :CEQ, 1e-6)
 	run(MargCons)
 	tempSCNumeraire = TempBaseWelfare - MargCons[:welfare, :UTILITY]
-
-	BeefPulse[TwentyTwenty] = OrigBeef[TwentyTwenty] + 1000*(4.8) 				
-	PorkPulse[TwentyTwenty] = OrigPork[TwentyTwenty]  + 1000*(2.7)
-	PoultryPulse[TwentyTwenty] = OrigPoultry[TwentyTwenty] + 1000*(6.7)
 
 	VegPulse = create_AnimalWelfare()
 	update_param!(VegPulse, :elasmu, eta)
@@ -133,7 +119,7 @@ for (meat, O, i) in zip(Meats, Origs, i)
 	TempBaseWelfare = tempM[:welfare, :UTILITY]
 
 	MPulse = copy(O)
-	MPulse[TwentyTwenty] = MPulse[TwentyTwenty] + 1000*.02 				
+	MPulse[TwentyTwenty] = MPulse[TwentyTwenty] + 1e6*.02 #One million more servings 				
 
 	M = create_AnimalWelfare()
 	update_param!(M, :CowEquiv, S)
@@ -183,50 +169,55 @@ hline!([0], linestyle=:dash, linecolor=:black)
 savefig(joinpath(output_directory, "UtilityPlot.pdf"))
 
 # ---------- Cows vs Chickens Plot ------- #
-Thetas = collect(0.1:.4:.9)
+Thetas = collect(0.005:.005:.05)
 SCCs   = zeros(length(Thetas))
 Beef_serving_Pulse = copy(OrigBeef)
-Beef_serving_Pulse[TwentyTwenty] = 100000*.02
+Beef_serving_Pulse[TwentyTwenty] = Beef_serving_Pulse[TwentyTwenty] + 1e6*.02
 Poultry_serving_Pulse = copy(OrigPoultry)
-Poultry_serving_Pulse[TwentyTwenty] = 100000*.02
+Poultry_serving_Pulse[TwentyTwenty] = Poultry_serving_Pulse[TwentyTwenty] + 1e6*.02
+rho = .000001
+dam_gama  = .0001
 for (i, theta) in enumerate(Thetas)
-	rho = .015
-	a1  = .0023600
 	marg_welfare_diff = 0.
 	while marg_welfare_diff<1.
-		rho = 0.95*rho
-		a1  = 1.05*a1
+		global dam_gama  = 1.002*dam_gama
 		m1  = create_AnimalWelfare()
 		m2  = create_AnimalWelfare()
 		update_param!(m1, :rho, rho)
-		update_param!(m1, :a1, a1)
+		update_param!(m1, :dam_gama, dam_gama)
+        update_param!(m1, :thetaB, theta)
+        update_param!(m1, :thetaC, theta)
+        update_param!(m1, :thetaP, theta)
 		update_param!(m1, :Beef, Beef_serving_Pulse)
 		update_param!(m2, :rho, rho)
-		update_param!(m2, :a1, a1)
-		update_param!(m2, :Beef, Poultry_serving_Pulse)
+		update_param!(m2, :dam_gama, dam_gama)
+        update_param!(m2, :thetaB, theta)
+        update_param!(m2, :thetaC, theta)
+        update_param!(m2, :thetaP, theta)
+		update_param!(m2, :Poultry, Poultry_serving_Pulse)
 		run(m1)
 		run(m2)
-		marg_welfare_diff = m2[:welfare, :UTILITY]/m1[:welfare, :UTILITY]		
+		marg_welfare_diff = m2[:welfare, :UTILITY]/m1[:welfare, :UTILITY]
 	end
 	#Compute implied SCC for this combination
 	base_welfare_for_scc = create_AnimalWelfare()
 	update_param!(base_welfare_for_scc, :rho, rho)
-	update_param!(base_welfare_for_scc, :a1, a1)
+	update_param!(base_welfare_for_scc, :dam_gama, dam_gama)
 	run(base_welfare_for_scc)
 	marg_cons_for_scc   = create_AnimalWelfare()
 	update_param!(marg_cons_for_scc, :rho, rho)
-	update_param!(marg_cons_for_scc, :a1, a1)
+	update_param!(marg_cons_for_scc, :dam_gama, dam_gama)
 	update_param!(marg_cons_for_scc, :CEQ, 1e-9)
 	run(marg_cons_for_scc)
 	Co2_pulse_for_scc   = create_AnimalWelfare()
-	update_param!(marg_cons_for_scc, :rho, rho)
-	update_param!(marg_cons_for_scc, :a1, a1)
-	update_param!(marg_cons_for_scc, :Co2Pulse, 1.)
+	update_param!(Co2_pulse_for_scc, :rho, rho)
+	update_param!(Co2_pulse_for_scc, :dam_gama, dam_gama)
+	update_param!(Co2_pulse_for_scc, :Co2Pulse, 1.)
+    run(Co2_pulse_for_scc)
 	SCCs[i] = 1e-6*(base_welfare_for_scc[:welfare, :UTILITY] - Co2_pulse_for_scc[:welfare, :UTILITY])/(base_welfare_for_scc[:welfare, :UTILITY] - marg_cons_for_scc[:welfare, :UTILITY])
 end
-plot(SCCs, Thetas, label="Indifference Line")
-
-
+Figure4df = DataFrame(SCCs = [0; SCCs], Theta = [0; Thetas])
+CSV.write(joinpath(output_directory, "Figure4.csv"), Figure4df)
 
 
 # --------- Optimal Policy ---------- # 
@@ -259,8 +250,8 @@ end
 opt = Opt(:LN_SBPLX, 3)
 opt.lower_bounds=-1*ones(3)
 opt.upper_bounds=ones(3)
-init = .75*ones(3)
-opt.xtol_rel = 1e-6
+init = .9*ones(3)
+opt.xtol_rel = 1e-2
 opt.max_objective = optanimals
 sol2 = optimize(opt, init)[2]
 BeefReduc = sol2[1]
@@ -273,7 +264,7 @@ println("Reduce Pork by $PorkReduc")
 # --------- Optimal Policy with 2 dimensional robustness -------- #
 alpha   = .025
 alphas 	= [alpha 1.1*alpha]
-uAs 	= collect(.9:.05:1.9)
+uAs 	= collect(.9:.1:1.9)
 
 DiffOpts = zeros(length(uAs), length(alphas))
 for (i, alpha) in enumerate(alphas)
@@ -290,8 +281,8 @@ for (i, alpha) in enumerate(alphas)
 	opt = Opt(:LN_SBPLX, 1)
 	opt.lower_bounds=[-1.0]
 	opt.upper_bounds=[1.0]
-	init = [.5]
-	opt.xtol_rel = 1e-4
+	init = [.8]
+	opt.xtol_rel = 1e-6
 	opt.max_objective = optveg
 	sol = optimize(opt, init)[2]
 	DiffOpts[j, i] = sol[1]
@@ -300,7 +291,7 @@ end
 
 plot(uAs, DiffOpts, linecolor=:red, lw=1.7, linestyle=[:solid :dashdot], label=["Baseline" "Increased Meat Utility"], xlabel="Animal Welfare", ylabel="Optimal Reduction", grid=false);
 savefig(joinpath(output_directory, "OneDimensionalRobustness.pdf"))
-Figure4 = DataFrame(column1 = uAs, column2 =DiffOpts[:,1], column3 = DiffOpts[:,2])
-CSV.write(joinpath(output_directory, "Figure4.csv"), Figure4)
+Figure3 = DataFrame(column1 = uAs, column2 =DiffOpts[:,1], column3 = DiffOpts[:,2])
+CSV.write(joinpath(output_directory, "Figure3.csv"), Figure3)
 
 

@@ -60,7 +60,7 @@ set_param!(m, :farm, :epsilon, epsilon)
 set_param!(m, :farm, :PBeef, PBeef)
 set_param!(m, :farm, :PPoultry, PPoultry)
 set_param!(m, :farm, :PPork, PPork)
-set_param!(m, :farm, :l, :lfarm, temp[:welfare, :l])
+set_param!(m, :farm, :lfarm, temp[:welfare, :l])
 set_param!(m, :farm, :BeefReduc, 0.)
 set_param!(m, :farm, :PorkReduc, 0.)
 set_param!(m, :farm, :PoultryReduc, 0.)
@@ -99,7 +99,7 @@ function ByAnimals_outcome(x::Array{Float64, 1}, SufferingEquiv=1.0)
 	return m[:welfare, :UTILITY]
 end
 
-#---- Estimates TFP Parameters -------#
+#---- Estimates Underlying TFP Parameters to 'Endogenize' -------#
 #m = create_dice_farm()
 #run(m)
 #DICEFARM_TFP = m[:grosseconomy, :AL][2015-1764:end]

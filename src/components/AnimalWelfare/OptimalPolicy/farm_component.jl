@@ -59,7 +59,7 @@
     BeefReduc       = Parameter()
     PorkReduc       = Parameter()
     PoultryReduc    = Parameter()
-    l               = Parameter(index=[time])
+    lfarm           = Parameter(index=[time])
 
     # ------ Emissions Intensities for each gas-animal -------- #
 
@@ -91,7 +91,7 @@
  
     function run_timestep(p, v, d, t)
 	
-    if gettime(t) >= 2020 #Allows planner to solve for optimal vegetarian frac
+    if gettime(t) == 2020 #Allows planner to solve for optimal vegetarian frac
         Beef = (1-p.BeefReduc)*(1-p.MeatReduc)*p.Beef[t]
         Pork = (1-p.PorkReduc)*(1-p.MeatReduc)*p.Pork[t]
         Poultry = (1-p.PoultryReduc)*(1-p.MeatReduc)*p.Poultry[t]
@@ -115,7 +115,7 @@
     end
 
     if gettime(t) >=2015
-    v.MeatPC[t]     = (p.theta_b*(Beef/(1e6*p.l[t]))^p.epsilon + p.theta_c*(Poultry/(1e6*p.l[t]))^p.epsilon + p.theta_p*(Pork/(1e6*p.l[t]))^p.epsilon)^(1/p.epsilon)
+    v.MeatPC[t]     = (p.theta_b*(Beef/(1e6*p.lfarm[t]))^p.epsilon + p.theta_c*(Poultry/(1e6*p.lfarm[t]))^p.epsilon + p.theta_p*(Pork/(1e6*p.lfarm[t]))^p.epsilon)^(1/p.epsilon)
     v.MeatCost[t]   = p.PBeef*Beef + p.PPoultry*Poultry + p.PPork*Pork
     end
     v.Cows[t]       = p.ABeef*Beef

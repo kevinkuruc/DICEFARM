@@ -27,12 +27,12 @@
     function run_timestep(p, v, d, t)
 
         #Need critical level: 
-        CL = ((1.9*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat)  #International Poverty Line
+        CL = ((1.9*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat)  #International Poverty Line plus some meat value
         
         #Per Animal Utility (assumed to be fixed for now)
-        UCow = ((p.CowEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat) #1 dollar per day, absent meat utility
-        UPig = ((p.PigEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat) #1 dollar per day, absent meat utility
-        UChicken = ((p.ChickenEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat)  #1 dollar per day, absent meat utility
+        UCow = ((p.CowEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat) #1 dollar per day, plus same meat utility
+        UPig = ((p.PigEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat) #1 dollar per day, plus same meat utility
+        UChicken = ((p.ChickenEquiv*365)^(1 - p.elasmu))/(1-p.elasmu) + p.alphameat*(.1)^(1-p.elasmeat)/(1-p.elasmeat)  #1 dollar per day, plus same meat utility
         if gettime(t) >=2015
         # Define human utility
         v.PERIODU[t] = (p.CPC[t] ^ (1 - p.elasmu)) / (1 - p.elasmu) + p.alphameat*(p.MeatPC[t]^(1-p.elasmeat))/(1-p.elasmeat) - CL
